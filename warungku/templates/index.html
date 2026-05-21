@@ -1,0 +1,1693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WarungKu — Fresh Groceries & Food Delivered</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f8fafc;color:#1e293b;min-height:100vh}
+a{text-decoration:none;color:inherit;cursor:pointer}
+button{cursor:pointer;border:none;font-family:inherit}
+input,select,textarea{font-family:inherit}
+
+/* NAV */
+nav{background:#fff;border-bottom:1px solid #e2e8f0;position:sticky;top:0;z-index:100}
+.nav-inner{max-width:1200px;margin:0 auto;padding:0 20px;height:60px;display:flex;align-items:center;gap:16px}
+.nav-logo{font-size:1.4rem;font-weight:800;color:#16a34a;margin-right:auto}
+.nav-logo span{color:#f97316}
+.nav-link{font-size:.9rem;color:#64748b;padding:6px 10px;border-radius:6px;transition:color .15s}
+.nav-link:hover{color:#16a34a}
+.nav-link.active{color:#16a34a;font-weight:600}
+.nav-cart{position:relative;background:#16a34a;color:#fff;border:none;border-radius:8px;padding:7px 14px;font-size:.85rem;font-weight:600;display:flex;align-items:center;gap:6px}
+.cart-badge{background:#f97316;color:#fff;border-radius:999px;font-size:.7rem;font-weight:700;padding:1px 6px;min-width:20px;text-align:center}
+.nav-user{font-size:.85rem;color:#475569;display:flex;align-items:center;gap:8px}
+.nav-user .avatar{width:32px;height:32px;border-radius:50%;background:#dcfce7;color:#16a34a;font-weight:700;font-size:.8rem;display:flex;align-items:center;justify-content:center}
+.btn-login{background:transparent;border:1px solid #16a34a;color:#16a34a;padding:6px 14px;border-radius:6px;font-size:.85rem;font-weight:600}
+.btn-login:hover{background:#f0fdf4}
+
+/* LAYOUT */
+.page{display:none;max-width:1200px;margin:0 auto;padding:24px 20px}
+.page.active{display:block}
+
+/* HERO */
+.hero{background:linear-gradient(135deg,#16a34a 0%,#15803d 100%);border-radius:16px;padding:48px 40px;color:#fff;margin-bottom:32px;display:flex;align-items:center;gap:40px}
+.hero-text h1{font-size:2.2rem;font-weight:800;line-height:1.2;margin-bottom:12px}
+.hero-text p{font-size:1rem;opacity:.9;margin-bottom:24px;max-width:420px}
+.hero-cta{background:#f97316;color:#fff;padding:12px 28px;border-radius:8px;font-size:1rem;font-weight:700;border:none}
+.hero-cta:hover{background:#ea6d0f}
+.hero-img{font-size:6rem;flex-shrink:0}
+
+/* SECTION */
+.section-title{font-size:1.25rem;font-weight:700;margin-bottom:16px;color:#1e293b}
+.section-subtitle{font-size:.875rem;color:#64748b;margin-bottom:20px;margin-top:-10px}
+
+/* CATEGORY PILLS */
+.cat-pills{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px}
+.cat-pill{padding:6px 16px;border-radius:999px;border:1px solid #e2e8f0;background:#fff;font-size:.85rem;color:#475569;cursor:pointer;transition:all .15s}
+.cat-pill:hover,.cat-pill.active{background:#16a34a;color:#fff;border-color:#16a34a}
+
+/* PRODUCT GRID */
+.product-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:16px}
+.product-card{background:#fff;border-radius:12px;border:1px solid #e2e8f0;overflow:hidden;transition:box-shadow .15s;cursor:pointer}
+.product-card:hover{box-shadow:0 4px 20px rgba(0,0,0,.08)}
+.product-img{background:linear-gradient(135deg,#f0fdf4,#dcfce7);height:140px;display:flex;align-items:center;justify-content:center;font-size:3rem}
+.product-info{padding:12px 14px}
+.product-name{font-weight:600;font-size:.9rem;margin-bottom:4px;color:#1e293b}
+.product-cat{font-size:.75rem;color:#94a3b8;margin-bottom:8px;text-transform:capitalize}
+.product-footer{display:flex;align-items:center;justify-content:space-between}
+.product-price{font-weight:700;color:#16a34a;font-size:.95rem}
+.btn-add{background:#16a34a;color:#fff;border:none;border-radius:6px;padding:5px 10px;font-size:.8rem;font-weight:600}
+.btn-add:hover{background:#15803d}
+
+/* CART PAGE */
+.cart-layout{display:grid;grid-template-columns:1fr 320px;gap:24px;align-items:start}
+.card{background:#fff;border-radius:12px;border:1px solid #e2e8f0;padding:20px}
+.cart-item{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #f1f5f9}
+.cart-item:last-child{border-bottom:none}
+.ci-img{width:56px;height:56px;border-radius:8px;background:#f0fdf4;display:flex;align-items:center;justify-content:center;font-size:1.8rem;flex-shrink:0}
+.ci-info{flex:1}
+.ci-name{font-weight:600;font-size:.9rem}
+.ci-price{font-size:.8rem;color:#64748b;margin-top:2px}
+.qty-ctrl{display:flex;align-items:center;gap:8px;margin-top:6px}
+.qty-btn{width:26px;height:26px;border-radius:6px;background:#f1f5f9;border:none;font-size:1rem;display:flex;align-items:center;justify-content:center;font-weight:700;color:#475569}
+.qty-btn:hover{background:#e2e8f0}
+.qty-val{font-weight:600;font-size:.9rem;min-width:20px;text-align:center}
+.ci-total{font-weight:700;color:#16a34a;font-size:.9rem;margin-left:auto;flex-shrink:0}
+.ci-remove{color:#ef4444;font-size:.75rem;cursor:pointer;margin-left:8px}
+
+/* ORDER SUMMARY */
+.summary-row{display:flex;justify-content:space-between;padding:6px 0;font-size:.9rem}
+.summary-row.total{border-top:1px solid #e2e8f0;margin-top:8px;padding-top:12px;font-weight:700;font-size:1rem;color:#1e293b}
+.btn-primary{width:100%;background:#16a34a;color:#fff;padding:12px;border-radius:8px;font-size:.95rem;font-weight:700;border:none;margin-top:12px}
+.btn-primary:hover{background:#15803d}
+.btn-primary:disabled{background:#94a3b8;cursor:not-allowed}
+.btn-secondary{width:100%;background:#f1f5f9;color:#475569;padding:10px;border-radius:8px;font-size:.9rem;font-weight:600;border:none;margin-top:8px}
+.btn-secondary:hover{background:#e2e8f0}
+
+/* FORMS */
+.form-group{margin-bottom:16px}
+.form-label{display:block;font-size:.85rem;font-weight:600;color:#374151;margin-bottom:6px}
+.form-input{width:100%;padding:10px 12px;border:1px solid #d1d5db;border-radius:8px;font-size:.9rem;outline:none;transition:border-color .15s}
+.form-input:focus{border-color:#16a34a;box-shadow:0 0 0 3px rgba(22,163,74,.1)}
+.form-select{width:100%;padding:10px 12px;border:1px solid #d1d5db;border-radius:8px;font-size:.9rem;background:#fff;outline:none}
+.form-select:focus{border-color:#16a34a}
+.form-hint{font-size:.78rem;color:#94a3b8;margin-top:4px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+/* AUTH PAGE */
+.auth-wrap{max-width:420px;margin:40px auto}
+.auth-card{background:#fff;border-radius:16px;border:1px solid #e2e8f0;padding:32px}
+.auth-title{font-size:1.4rem;font-weight:800;margin-bottom:4px}
+.auth-sub{font-size:.85rem;color:#64748b;margin-bottom:24px}
+.auth-link{color:#16a34a;font-size:.85rem;font-weight:600;cursor:pointer}
+.divider{text-align:center;color:#94a3b8;font-size:.8rem;margin:16px 0;position:relative}
+.divider::before,.divider::after{content:'';position:absolute;top:50%;width:44%;height:1px;background:#e2e8f0}
+.divider::before{left:0}.divider::after{right:0}
+
+/* CHECKOUT STEPS */
+.steps{display:flex;align-items:center;gap:0;margin-bottom:32px}
+.step{display:flex;align-items:center;gap:8px;font-size:.85rem;color:#94a3b8}
+.step.active{color:#16a34a;font-weight:600}
+.step.done{color:#16a34a}
+.step-num{width:28px;height:28px;border-radius:50%;border:2px solid #e2e8f0;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.8rem;background:#fff;flex-shrink:0}
+.step.active .step-num{border-color:#16a34a;color:#16a34a}
+.step.done .step-num{background:#16a34a;border-color:#16a34a;color:#fff}
+.step-sep{flex:1;height:1px;background:#e2e8f0;margin:0 8px}
+
+/* CHECKOUT LAYOUT */
+.checkout-layout{display:grid;grid-template-columns:1fr 300px;gap:24px;align-items:start}
+
+/* ORDER SUCCESS */
+.success-box{text-align:center;padding:48px 20px}
+.success-icon{font-size:4rem;margin-bottom:16px}
+.success-title{font-size:1.6rem;font-weight:800;color:#16a34a;margin-bottom:8px}
+.success-sub{color:#64748b;margin-bottom:24px}
+.success-order{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:16px;display:inline-block;font-size:.9rem;color:#15803d;font-weight:600;margin-bottom:24px}
+
+/* ACCOUNT PAGE */
+.account-layout{display:grid;grid-template-columns:220px 1fr;gap:24px;align-items:start}
+.account-nav{background:#fff;border-radius:12px;border:1px solid #e2e8f0;overflow:hidden}
+.account-nav-item{padding:12px 16px;font-size:.9rem;cursor:pointer;color:#475569;border-bottom:1px solid #f1f5f9;display:flex;align-items:center;gap:8px}
+.account-nav-item:last-child{border-bottom:none}
+.account-nav-item:hover{background:#f8fafc;color:#16a34a}
+.account-nav-item.active{background:#f0fdf4;color:#16a34a;font-weight:600}
+.account-nav-icon{font-size:1rem}
+
+/* STAT CARDS */
+.stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px}
+.stat-card{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:16px}
+.stat-label{font-size:.78rem;color:#94a3b8;margin-bottom:4px}
+.stat-value{font-size:1.3rem;font-weight:800;color:#1e293b}
+.stat-value.green{color:#16a34a}
+.stat-value.orange{color:#f97316}
+
+/* ORDERS TABLE */
+.orders-list{display:flex;flex-direction:column;gap:10px}
+.order-card{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:14px 16px;cursor:pointer;transition:box-shadow .15s}
+.order-card:hover{box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.order-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.order-id{font-weight:700;font-size:.9rem;color:#1e293b}
+.order-date{font-size:.78rem;color:#94a3b8}
+.order-items{font-size:.82rem;color:#64748b;margin-bottom:6px}
+.order-foot{display:flex;justify-content:space-between;align-items:center}
+.order-total{font-weight:700;color:#16a34a}
+.status-badge{padding:3px 10px;border-radius:999px;font-size:.75rem;font-weight:600;display:inline-block}
+.status-pending{background:#fef9c3;color:#854d0e}
+.status-processing{background:#dbeafe;color:#1d4ed8}
+.status-shipped{background:#e0e7ff;color:#4338ca}
+.status-delivered{background:#dcfce7;color:#15803d}
+.status-cancelled{background:#fee2e2;color:#b91c1c}
+.status-approved{background:#dcfce7;color:#15803d}
+.status-rejected{background:#fee2e2;color:#b91c1c}
+
+/* MEMBERSHIP */
+.plan-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px}
+.plan-card{background:#fff;border:2px solid #e2e8f0;border-radius:14px;padding:24px;text-align:center;position:relative;transition:border-color .15s}
+.plan-card.current{border-color:#16a34a}
+.plan-card.featured{border-color:#f97316}
+.plan-badge{position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:#f97316;color:#fff;font-size:.72rem;font-weight:700;padding:3px 12px;border-radius:999px}
+.plan-name{font-size:1rem;font-weight:700;margin-bottom:4px}
+.plan-price{font-size:1.8rem;font-weight:800;color:#1e293b;margin-bottom:2px}
+.plan-price small{font-size:.9rem;font-weight:400;color:#94a3b8}
+.plan-features{text-align:left;margin:16px 0;display:flex;flex-direction:column;gap:6px}
+.plan-feat{font-size:.82rem;color:#475569;display:flex;align-items:center;gap:6px}
+.plan-feat::before{content:'✓';color:#16a34a;font-weight:700;flex-shrink:0}
+.btn-plan{width:100%;padding:10px;border-radius:8px;font-weight:600;font-size:.9rem;border:2px solid #16a34a;background:transparent;color:#16a34a}
+.btn-plan:hover,.btn-plan.active{background:#16a34a;color:#fff}
+
+/* GIFT CARDS */
+.gc-denom-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px}
+.gc-denom{background:#fff;border:2px solid #e2e8f0;border-radius:10px;padding:16px;text-align:center;cursor:pointer;transition:all .15s}
+.gc-denom:hover,.gc-denom.selected{border-color:#16a34a;background:#f0fdf4}
+.gc-denom-amount{font-size:1.1rem;font-weight:800;color:#1e293b}
+.gc-denom-label{font-size:.75rem;color:#94a3b8;margin-top:2px}
+.gc-card{background:linear-gradient(135deg,#16a34a,#15803d);border-radius:12px;padding:20px;color:#fff;margin-bottom:10px}
+.gc-card-amount{font-size:1.6rem;font-weight:800;margin-bottom:4px}
+.gc-card-code{font-family:monospace;font-size:1rem;background:rgba(255,255,255,.2);padding:4px 10px;border-radius:6px;letter-spacing:2px}
+.gc-card-status{font-size:.75rem;opacity:.8;margin-top:8px}
+.gc-card-footer{display:flex;justify-content:space-between;align-items:flex-end;margin-top:12px}
+
+/* VOUCHERS */
+.voucher-card{background:#fff;border:1px dashed #16a34a;border-radius:10px;padding:14px 16px;display:flex;align-items:center;gap:14px;margin-bottom:10px}
+.voucher-icon{font-size:2rem}
+.voucher-info{flex:1}
+.voucher-code{font-family:monospace;font-weight:700;font-size:.9rem;color:#1e293b}
+.voucher-desc{font-size:.8rem;color:#64748b;margin-top:2px}
+.voucher-exp{font-size:.75rem;color:#94a3b8;margin-top:4px}
+.voucher-val{font-weight:800;color:#16a34a;font-size:1.1rem;flex-shrink:0}
+
+/* TOAST */
+#toast-container{position:fixed;bottom:24px;right:24px;display:flex;flex-direction:column;gap:8px;z-index:9999}
+.toast{padding:12px 16px;border-radius:10px;font-size:.875rem;font-weight:500;box-shadow:0 4px 20px rgba(0,0,0,.15);animation:slideIn .2s ease;max-width:320px;display:flex;align-items:center;gap:8px}
+.toast.success{background:#16a34a;color:#fff}
+.toast.error{background:#ef4444;color:#fff}
+.toast.info{background:#3b82f6;color:#fff}
+@keyframes slideIn{from{transform:translateX(30px);opacity:0}to{transform:translateX(0);opacity:1}}
+
+/* LOADING */
+.loading{text-align:center;padding:40px;color:#94a3b8;font-size:.9rem}
+
+/* EMPTY STATE */
+.empty-state{text-align:center;padding:48px 20px;color:#94a3b8}
+.empty-icon{font-size:3rem;margin-bottom:12px}
+.empty-title{font-size:1rem;font-weight:600;color:#64748b;margin-bottom:6px}
+
+/* TABS */
+.tab-bar{display:flex;gap:4px;border-bottom:1px solid #e2e8f0;margin-bottom:20px}
+.tab{padding:8px 16px;font-size:.875rem;font-weight:500;color:#64748b;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px}
+.tab.active{color:#16a34a;border-bottom-color:#16a34a;font-weight:600}
+
+/* ADMIN/SELLER */
+.data-table{width:100%;border-collapse:collapse;font-size:.875rem}
+.data-table th{text-align:left;padding:10px 12px;border-bottom:2px solid #e2e8f0;color:#64748b;font-size:.78rem;text-transform:uppercase;letter-spacing:.04em}
+.data-table td{padding:10px 12px;border-bottom:1px solid #f1f5f9;color:#1e293b}
+.data-table tr:hover td{background:#f8fafc}
+.action-btn{padding:4px 10px;border-radius:6px;font-size:.78rem;font-weight:600;border:none;cursor:pointer}
+.action-btn.danger{background:#fee2e2;color:#b91c1c}
+.action-btn.success{background:#dcfce7;color:#15803d}
+.action-btn.primary{background:#dbeafe;color:#1d4ed8}
+
+/* RETURN FORM */
+.alert{padding:12px 16px;border-radius:8px;font-size:.875rem;margin-bottom:16px}
+.alert-info{background:#eff6ff;border:1px solid #bfdbfe;color:#1d4ed8}
+.alert-success{background:#f0fdf4;border:1px solid #bbf7d0;color:#15803d}
+.alert-warn{background:#fffbeb;border:1px solid #fde68a;color:#92400e}
+
+/* PRODUCT DETAIL */
+.pd-layout{display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:start}
+.pd-img{background:linear-gradient(135deg,#f0fdf4,#dcfce7);border-radius:16px;height:300px;display:flex;align-items:center;justify-content:center;font-size:6rem}
+.pd-name{font-size:1.6rem;font-weight:800;margin-bottom:6px}
+.pd-cat{font-size:.85rem;color:#94a3b8;text-transform:capitalize;margin-bottom:12px}
+.pd-price{font-size:2rem;font-weight:800;color:#16a34a;margin-bottom:20px}
+.pd-desc{font-size:.9rem;color:#64748b;line-height:1.6;margin-bottom:24px}
+.pd-qty{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.pd-qty-btn{width:36px;height:36px;border-radius:8px;background:#f1f5f9;border:none;font-size:1.2rem;font-weight:700}
+.pd-qty-val{font-size:1.1rem;font-weight:700;min-width:32px;text-align:center}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+  .hero{flex-direction:column;gap:20px;padding:32px 24px}
+  .hero-img{display:none}
+  .cart-layout,.checkout-layout,.account-layout,.pd-layout{grid-template-columns:1fr}
+  .plan-grid{grid-template-columns:1fr}
+  .stat-grid{grid-template-columns:1fr 1fr}
+  .form-row{grid-template-columns:1fr}
+  .gc-denom-grid{grid-template-columns:repeat(2,1fr)}
+  .nav-link{display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <div class="nav-logo" onclick="navigate('home')" style="cursor:pointer">Warung<span>Ku</span></div>
+    <a class="nav-link" onclick="navigate('home')">Shop</a>
+    <a class="nav-link" onclick="navigate('membership')">Membership</a>
+    <a class="nav-link" onclick="navigate('gift-cards')">Gift Cards</a>
+    <div id="nav-auth-links" style="display:flex;align-items:center;gap:8px">
+      <a class="nav-link" onclick="navigate('account')">Account</a>
+    </div>
+    <button class="nav-cart" onclick="navigate('cart')">
+      🛒 Cart <span class="cart-badge" id="cart-badge">0</span>
+    </button>
+    <div id="nav-user" style="display:none" class="nav-user">
+      <div class="avatar" id="nav-avatar">?</div>
+      <span id="nav-name" style="font-size:.85rem;font-weight:600"></span>
+      <a style="font-size:.8rem;color:#94a3b8;cursor:pointer" onclick="logout()">Logout</a>
+    </div>
+    <div id="nav-login" class="nav-user">
+      <button class="btn-login" onclick="navigate('login')">Sign In</button>
+    </div>
+  </div>
+</nav>
+
+<!-- TOAST -->
+<div id="toast-container"></div>
+
+<!-- HOME -->
+<div class="page active" id="page-home">
+  <div class="hero">
+    <div class="hero-text">
+      <h1>Fresh Food & Groceries<br>Delivered Fast</h1>
+      <p>Your neighborhood warung, now online. Order food, drinks, and household essentials in minutes.</p>
+      <button class="hero-cta" onclick="document.getElementById('shop-section').scrollIntoView({behavior:'smooth'})">Shop Now</button>
+    </div>
+    <div class="hero-img"><img src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=200&h=200&q=80" alt="Groceries" style="width: 140px; height: 140px; border-radius: 16px; object-fit: cover; box-shadow: 0 4px 12px rgba(0,0,0,0.15);"></div>
+  </div>
+  <div id="shop-section">
+    <div class="section-title">Browse Products</div>
+    <div class="cat-pills" id="cat-pills">
+      <div class="cat-pill active" onclick="filterCat('all',this)">All</div>
+      <div class="cat-pill" onclick="filterCat('food',this)">🍽 Food</div>
+      <div class="cat-pill" onclick="filterCat('drink',this)">🥤 Drinks</div>
+      <div class="cat-pill" onclick="filterCat('household',this)">🏠 Household</div>
+      <div class="cat-pill" onclick="filterCat('grocery',this)">🛒 Grocery</div>
+    </div>
+    <div class="product-grid" id="product-grid">
+      <div class="loading">Loading products…</div>
+    </div>
+  </div>
+</div>
+
+<!-- PRODUCT DETAIL -->
+<div class="page" id="page-product-detail">
+  <div style="margin-bottom:16px"><a onclick="navigate('home')" style="color:#16a34a;font-size:.875rem;cursor:pointer">← Back to Shop</a></div>
+  <div class="pd-layout" id="pd-content"></div>
+</div>
+
+<!-- CART -->
+<div class="page" id="page-cart">
+  <div class="section-title">Your Cart</div>
+  <div class="cart-layout">
+    <div id="cart-items-container"></div>
+    <div>
+      <div class="card" id="cart-summary"></div>
+    </div>
+  </div>
+</div>
+
+<!-- CHECKOUT -->
+<div class="page" id="page-checkout">
+  <div class="section-title">Checkout</div>
+  <div class="steps">
+    <div class="step" id="step-1"><div class="step-num">1</div> Shipping</div>
+    <div class="step-sep"></div>
+    <div class="step" id="step-2"><div class="step-num">2</div> Delivery</div>
+    <div class="step-sep"></div>
+    <div class="step" id="step-3"><div class="step-num">3</div> Offers</div>
+    <div class="step-sep"></div>
+    <div class="step" id="step-4"><div class="step-num">4</div> Payment</div>
+  </div>
+  <div class="checkout-layout">
+    <div id="checkout-form-area"></div>
+    <div class="card" id="checkout-summary-side"></div>
+  </div>
+</div>
+
+<!-- ORDER SUCCESS -->
+<div class="page" id="page-order-success">
+  <div class="success-box">
+    <div class="success-icon">🎉</div>
+    <div class="success-title">Order Placed!</div>
+    <div class="success-sub">Thank you for your purchase. We're preparing your order now.</div>
+    <div class="success-order" id="success-order-id"></div>
+    <div style="display:flex;gap:12px;justify-content:center">
+      <button class="btn-primary" style="width:auto;padding:10px 24px" onclick="navigate('account-orders')">View Orders</button>
+      <button class="btn-secondary" style="width:auto;padding:10px 24px" onclick="navigate('home')">Continue Shopping</button>
+    </div>
+  </div>
+</div>
+
+<!-- LOGIN -->
+<div class="page" id="page-login">
+  <div class="auth-wrap">
+    <div class="auth-card">
+      <div class="auth-title">Welcome back</div>
+      <div class="auth-sub">Sign in to your WarungKu account</div>
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input class="form-input" id="login-email" type="email" placeholder="you@email.com">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input class="form-input" id="login-password" type="password" placeholder="Your password">
+      </div>
+      <button class="btn-primary" onclick="doLogin()">Sign In</button>
+      <div class="divider">or</div>
+      <div style="text-align:center;font-size:.85rem;color:#64748b">Don't have an account? <a class="auth-link" onclick="navigate('register')">Create one</a></div>
+    </div>
+  </div>
+</div>
+
+<!-- VERIFY 2FA -->
+<div class="page" id="page-verify-2fa">
+  <div class="auth-wrap">
+    <div class="auth-card">
+      <div class="auth-title">Verify Identity</div>
+      <div class="auth-sub">Enter the one-time code sent to your phone/email</div>
+      <div class="alert alert-info" id="otp-hint-2fa"></div>
+      <div class="form-group">
+        <label class="form-label">Verification Code</label>
+        <input class="form-input" id="otp-2fa" placeholder="6-digit code" style="letter-spacing:4px;font-size:1.2rem;text-align:center">
+      </div>
+      <button class="btn-primary" onclick="do2FA()">Verify</button>
+    </div>
+  </div>
+</div>
+
+<!-- SELECT ROLE -->
+<div class="page" id="page-select-role">
+  <div class="auth-wrap">
+    <div class="auth-card">
+      <div class="auth-title">How will you use WarungKu?</div>
+      <div class="auth-sub">Choose your account type</div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div class="order-card" onclick="doSelectRole('buyer')" style="cursor:pointer;padding:16px">
+          <div style="font-size:1.5rem;margin-bottom:6px">🛍</div>
+          <div style="font-weight:700">Buyer</div>
+          <div style="font-size:.82rem;color:#64748b;margin-top:2px">Browse and purchase products</div>
+        </div>
+        <div class="order-card" onclick="doSelectRole('seller')" style="cursor:pointer;padding:16px">
+          <div style="font-size:1.5rem;margin-bottom:6px">🏪</div>
+          <div style="font-weight:700">Seller</div>
+          <div style="font-size:.82rem;color:#64748b;margin-top:2px">List and manage your products</div>
+        </div>
+        <div class="order-card" onclick="doSelectRole('admin')" style="cursor:pointer;padding:16px">
+          <div style="font-size:1.5rem;margin-bottom:6px">⚙️</div>
+          <div style="font-weight:700">Administrator</div>
+          <div style="font-size:.82rem;color:#64748b;margin-top:2px">Manage platform operations</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- REGISTER -->
+<div class="page" id="page-register">
+  <div class="auth-wrap">
+    <div class="auth-card">
+      <div class="auth-title">Create account</div>
+      <div class="auth-sub">Join WarungKu today</div>
+      <div class="form-group">
+        <label class="form-label">Full Name</label>
+        <input class="form-input" id="reg-name" placeholder="Your full name">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input class="form-input" id="reg-email" type="email" placeholder="you@email.com">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Phone</label>
+        <input class="form-input" id="reg-phone" placeholder="08xxxxxxxxxx">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input class="form-input" id="reg-password" type="password" placeholder="Min 6 characters">
+      </div>
+      <button class="btn-primary" onclick="doRegister()">Create Account</button>
+      <div class="divider">or</div>
+      <div style="text-align:center;font-size:.85rem;color:#64748b">Already have an account? <a class="auth-link" onclick="navigate('login')">Sign in</a></div>
+    </div>
+  </div>
+</div>
+
+<!-- VERIFY EMAIL -->
+<div class="page" id="page-verify-email">
+  <div class="auth-wrap">
+    <div class="auth-card">
+      <div class="auth-title">Verify your email</div>
+      <div class="auth-sub">We sent a code to your email address</div>
+      <div class="alert alert-info" id="otp-hint-email"></div>
+      <div class="form-group">
+        <label class="form-label">Verification Code</label>
+        <input class="form-input" id="otp-email" placeholder="6-digit code" style="letter-spacing:4px;font-size:1.2rem;text-align:center">
+      </div>
+      <button class="btn-primary" onclick="doVerifyEmail()">Verify Email</button>
+    </div>
+  </div>
+</div>
+
+<!-- COMPLETE PROFILE -->
+<div class="page" id="page-complete-profile">
+  <div class="auth-wrap">
+    <div class="auth-card">
+      <div class="auth-title">Complete your profile</div>
+      <div class="auth-sub">Help us personalize your experience</div>
+      <div class="form-group">
+        <label class="form-label">Date of Birth</label>
+        <input class="form-input" id="cp-dob" type="date">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Full Address</label>
+        <textarea class="form-input" id="cp-address" rows="3" placeholder="Street name, district"></textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">City</label>
+          <input class="form-input" id="cp-city" placeholder="Jakarta">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Postal Code</label>
+          <input class="form-input" id="cp-postal" placeholder="12345">
+        </div>
+      </div>
+      <button class="btn-primary" onclick="doCompleteProfile()">Save Profile</button>
+    </div>
+  </div>
+</div>
+
+<!-- ACCOUNT -->
+<div class="page" id="page-account">
+  <div class="account-layout">
+    <div class="account-nav">
+      <div class="account-nav-item active" onclick="showAccountTab('overview')" id="atab-overview"><span class="account-nav-icon">🏠</span> Overview</div>
+      <div class="account-nav-item" onclick="showAccountTab('orders')" id="atab-orders"><span class="account-nav-icon">📦</span> My Orders</div>
+      <div class="account-nav-item" onclick="showAccountTab('vouchers')" id="atab-vouchers"><span class="account-nav-icon">🎟</span> Vouchers</div>
+      <div class="account-nav-item" onclick="showAccountTab('points')" id="atab-points"><span class="account-nav-icon">⭐</span> Points & Balance</div>
+      <div class="account-nav-item" onclick="showAccountTab('returns')" id="atab-returns"><span class="account-nav-icon">↩️</span> Returns</div>
+      <div class="account-nav-item" onclick="showAccountTab('seller')" id="atab-seller"><span class="account-nav-icon">🏪</span> Seller Hub</div>
+      <div class="account-nav-item" onclick="showAccountTab('admin')" id="atab-admin"><span class="account-nav-icon">⚙️</span> Admin Panel</div>
+    </div>
+    <div id="account-content"></div>
+  </div>
+</div>
+
+<!-- MEMBERSHIP -->
+<div class="page" id="page-membership">
+  <div class="section-title">Membership Plans</div>
+  <div class="section-subtitle">Unlock free shipping, discounts, and more with a premium plan</div>
+  <div class="plan-grid" id="plan-grid"></div>
+  <div class="card" id="sub-status-card" style="display:none;max-width:500px"></div>
+  <div class="card" id="sub-payment-card" style="display:none;max-width:500px"></div>
+</div>
+
+<!-- GIFT CARDS -->
+<div class="page" id="page-gift-cards">
+  <div class="section-title">Gift Cards</div>
+  <div class="tab-bar">
+    <div class="tab active" onclick="gcTab('buy',this)">Buy a Gift Card</div>
+    <div class="tab" onclick="gcTab('my',this)">My Gift Cards</div>
+    <div class="tab" onclick="gcTab('redeem',this)">Redeem</div>
+    <div class="tab" onclick="gcTab('transfer',this)">Transfer</div>
+  </div>
+  <div id="gc-content"></div>
+</div>
+
+<!-- ORDER DETAIL -->
+<div class="page" id="page-order-detail">
+  <div style="margin-bottom:16px"><a onclick="navigate('account-orders')" style="color:#16a34a;font-size:.875rem;cursor:pointer">← Back to Orders</a></div>
+  <div id="order-detail-content"></div>
+</div>
+
+<script>
+// ── STATE ──────────────────────────────────────────────────────────────────
+const state = {
+  token: localStorage.getItem('wk_token') || null,
+  user: null,
+  cart: [],
+  products: [],
+  checkoutId: null,
+  checkoutData: null,
+  checkoutStep: 1,
+  pendingOtp: null,
+  pendingOtp2fa: null,
+  selectedPlan: null,
+  subPaymentId: null,
+  gcSelectedAmount: null,
+  gcPaymentId: null,
+  gcCardId: null,
+  currentOrderId: null,
+};
+
+function getProductImage(p) {
+  if (!p) return '<img src="https://images.unsplash.com/photo-1604719312566-8912e9227c6a?auto=format&fit=crop&w=300&h=300&q=80" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;">';
+  const imgMap = {
+    'P001': 'https://images.unsplash.com/photo-1603133872878-684f208fb84b?auto=format&fit=crop&w=300&h=300&q=80',
+    'P002': 'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=300&h=300&q=80',
+    'P003': '/static/media__1777459119587.png',
+    'P004': '/static/media__1777459166430.png',
+    'P005': 'https://images.unsplash.com/photo-1572442388796-11668a67e53d?auto=format&fit=crop&w=300&h=300&q=80',
+    'P006': '/static/media__1777459211163.png',
+    'P007': '/static/media__1777459242164.png',
+    'P008': '/static/media__1777459323177.png',
+  };
+  const catMap = {
+    food: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=300&h=300&q=80',
+    drink: 'https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=300&h=300&q=80',
+    household: 'https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&w=300&h=300&q=80',
+    grocery: 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=300&h=300&q=80'
+  };
+  const url = imgMap[p.id] || catMap[p.category] || 'https://images.unsplash.com/photo-1604719312566-8912e9227c6a?auto=format&fit=crop&w=300&h=300&q=80';
+  return `<img src="${url}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;">`;
+}
+
+// ── API ────────────────────────────────────────────────────────────────────
+async function api(method, path, body) {
+  const opts = { method, headers: { 'Content-Type': 'application/json' } };
+  if (state.token) opts.headers['Authorization'] = 'Bearer ' + state.token;
+  if (body) opts.body = JSON.stringify(body);
+  try {
+    const r = await fetch('/api' + path, opts);
+    return await r.json();
+  } catch(e) {
+    return { success: false, error: 'Network error' };
+  }
+}
+
+// ── TOAST ─────────────────────────────────────────────────────────────────
+function toast(msg, type='info') {
+  const el = document.createElement('div');
+  el.className = 'toast ' + type;
+  el.textContent = msg;
+  document.getElementById('toast-container').appendChild(el);
+  setTimeout(() => el.remove(), 3500);
+}
+
+// ── ROUTER ────────────────────────────────────────────────────────────────
+function navigate(view) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const handlers = {
+    'home': loadHome,
+    'cart': renderCart,
+    'checkout': startCheckout,
+    'login': ()=>{},
+    'register': ()=>{},
+    'verify-email': ()=>{},
+    'verify-2fa': ()=>{},
+    'select-role': ()=>{},
+    'complete-profile': ()=>{},
+    'account': ()=>{ loadAccount(); },
+    'account-orders': ()=>{ loadAccount('orders'); },
+    'account-returns': ()=>{ loadAccount('returns'); },
+    'membership': loadMembership,
+    'gift-cards': ()=>{ loadGiftCards('buy'); },
+    'order-success': ()=>{},
+    'product-detail': ()=>{},
+    'order-detail': ()=>{},
+  };
+
+  const map = {
+    'home':'page-home','cart':'page-cart','checkout':'page-checkout',
+    'login':'page-login','register':'page-register','verify-email':'page-verify-email',
+    'verify-2fa':'page-verify-2fa','select-role':'page-select-role',
+    'complete-profile':'page-complete-profile','account':'page-account',
+    'account-orders':'page-account','account-returns':'page-account',
+    'membership':'page-membership','gift-cards':'page-gift-cards',
+    'order-success':'page-order-success','product-detail':'page-product-detail',
+    'order-detail':'page-order-detail',
+  };
+
+  const pageId = map[view] || 'page-home';
+  const page = document.getElementById(pageId);
+  if (page) page.classList.add('active');
+  window.scrollTo(0,0);
+
+  if (handlers[view]) handlers[view]();
+
+  if (view === 'account-orders') setTimeout(()=>showAccountTab('orders'), 50);
+  if (view === 'account-returns') setTimeout(()=>showAccountTab('returns'), 50);
+}
+
+// ── NAVBAR ────────────────────────────────────────────────────────────────
+function updateNav() {
+  document.getElementById('nav-user').style.display = state.user ? 'flex' : 'none';
+  document.getElementById('nav-login').style.display = state.user ? 'none' : 'flex';
+  if (state.user) {
+    document.getElementById('nav-name').textContent = state.user.name.split(' ')[0];
+    document.getElementById('nav-avatar').textContent = state.user.name[0].toUpperCase();
+  }
+  document.getElementById('cart-badge').textContent = state.cart.reduce((s,i)=>s+i.quantity,0);
+}
+
+function logout() {
+  state.token = null; state.user = null;
+  localStorage.removeItem('wk_token');
+  state.cart = [];
+  updateNav();
+  navigate('home');
+  toast('Logged out', 'info');
+}
+
+// ── HOME ──────────────────────────────────────────────────────────────────
+let allProducts = [];
+let currentCat = 'all';
+
+async function loadHome() {
+  if (allProducts.length === 0) {
+    const r = await api('GET', '/products');
+    if (r.success) allProducts = r.data.products;
+  }
+  renderProductGrid(allProducts);
+}
+
+function filterCat(cat, el) {
+  currentCat = cat;
+  document.querySelectorAll('.cat-pill').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  renderProductGrid(cat === 'all' ? allProducts : allProducts.filter(p => p.category === cat));
+}
+
+function renderProductGrid(products) {
+  const grid = document.getElementById('product-grid');
+  if (!products.length) {
+    grid.innerHTML = '<div class="loading">No products found.</div>';
+    return;
+  }
+  grid.innerHTML = products.map(p => `
+    <div class="product-card" onclick="openProduct('${p.id}')">
+      <div class="product-img">${getProductImage(p)}</div>
+      <div class="product-info">
+        <div class="product-name">${p.name}</div>
+        <div class="product-cat">${p.category}</div>
+        <div class="product-footer">
+          <div class="product-price">${fmtRp(p.price)}</div>
+          <button class="btn-add" onclick="event.stopPropagation();addToCart('${p.id}')">+ Add</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function openProduct(id) {
+  const p = allProducts.find(x => x.id === id);
+  if (!p) return;
+  state._viewProduct = p;
+  const el = document.getElementById('pd-content');
+  el.innerHTML = `
+    <div class="pd-img">${getProductImage(p)}</div>
+    <div>
+      <div class="pd-name">${p.name}</div>
+      <div class="pd-cat">${p.category}</div>
+      <div class="pd-price">${fmtRp(p.price)}</div>
+      <div class="pd-desc">Fresh, quality ${p.category} product sourced locally. Available for fast delivery straight to your door.</div>
+      <div class="pd-qty">
+        <button class="pd-qty-btn" onclick="pdQty(-1)">−</button>
+        <span class="pd-qty-val" id="pd-qty-val">1</span>
+        <button class="pd-qty-btn" onclick="pdQty(1)">+</button>
+      </div>
+      <button class="btn-primary" style="width:auto;padding:12px 32px" onclick="addToCartQty('${p.id}')">Add to Cart — ${fmtRp(p.price)}</button>
+    </div>`;
+  navigate('product-detail');
+}
+
+function pdQty(d) {
+  const el = document.getElementById('pd-qty-val');
+  el.textContent = Math.max(1, parseInt(el.textContent) + d);
+}
+
+function addToCartQty(id) {
+  const qty = parseInt(document.getElementById('pd-qty-val').textContent);
+  const p = allProducts.find(x=>x.id===id);
+  if (!p) return;
+  for (let i=0;i<qty;i++) addToCartItem(p);
+  navigate('cart');
+}
+
+// ── CART ──────────────────────────────────────────────────────────────────
+function addToCart(id) {
+  if (!state.token) { toast('Sign in to add items to cart','info'); navigate('login'); return; }
+  const p = allProducts.find(x=>x.id===id);
+  if (!p) return;
+  addToCartItem(p);
+  toast(p.name + ' added to cart', 'success');
+  updateNav();
+}
+
+function addToCartItem(p) {
+  const ex = state.cart.find(x=>x.product_id===p.id);
+  if (ex) ex.quantity++;
+  else state.cart.push({product_id:p.id, name:p.name, price:p.price, quantity:1});
+  syncCartWithServer();
+  updateNav();
+}
+
+async function syncCartWithServer() {
+  if (!state.token) return;
+  // Mirror local cart to server
+  for (const item of state.cart) {
+    await api('POST', '/cart/items', {product_id: item.product_id, quantity: item.quantity});
+  }
+}
+
+function renderCart() {
+  if (!state.token) { navigate('login'); return; }
+  const container = document.getElementById('cart-items-container');
+  const summary = document.getElementById('cart-summary');
+  if (!state.cart.length) {
+    container.innerHTML = `<div class="empty-state"><div class="empty-icon">🛒</div><div class="empty-title">Your cart is empty</div><p style="font-size:.85rem;color:#94a3b8">Browse our products and add something delicious!</p><button class="btn-primary" style="width:auto;margin:16px auto 0;padding:10px 24px;display:block" onclick="navigate('home')">Start Shopping</button></div>`;
+    summary.innerHTML = '';
+    return;
+  }
+  const subtotal = state.cart.reduce((s,i)=>s+i.price*i.quantity,0);
+  container.innerHTML = `<div class="card"><div class="section-title" style="margin-bottom:16px">Cart Items</div>${state.cart.map(item=>`
+    <div class="cart-item">
+      <div class="ci-img">${getProductImage(allProducts.find(p=>p.id===item.product_id))}</div>
+      <div class="ci-info">
+        <div class="ci-name">${item.name}</div>
+        <div class="ci-price">${fmtRp(item.price)} each</div>
+        <div class="qty-ctrl">
+          <button class="qty-btn" onclick="updateQty('${item.product_id}',-1)">−</button>
+          <span class="qty-val">${item.quantity}</span>
+          <button class="qty-btn" onclick="updateQty('${item.product_id}',1)">+</button>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end">
+        <div class="ci-total">${fmtRp(item.price*item.quantity)}</div>
+        <span class="ci-remove" onclick="removeFromCart('${item.product_id}')">Remove</span>
+      </div>
+    </div>`).join('')}</div>`;
+  summary.innerHTML = `
+    <div class="section-title" style="margin-bottom:12px">Order Summary</div>
+    <div class="summary-row"><span>Subtotal (${state.cart.length} item${state.cart.length>1?'s':''})</span><span>${fmtRp(subtotal)}</span></div>
+    <div class="summary-row"><span>Shipping</span><span style="color:#94a3b8">Calculated at checkout</span></div>
+    <div class="summary-row total"><span>Estimated Total</span><span>${fmtRp(subtotal)}</span></div>
+    <button class="btn-primary" onclick="navigate('checkout')">Proceed to Checkout</button>
+    <button class="btn-secondary" onclick="navigate('home')">Continue Shopping</button>`;
+}
+
+function updateQty(productId, delta) {
+  const item = state.cart.find(x=>x.product_id===productId);
+  if (!item) return;
+  item.quantity = Math.max(0, item.quantity + delta);
+  if (item.quantity === 0) state.cart = state.cart.filter(x=>x.product_id!==productId);
+  updateNav();
+  renderCart();
+}
+
+function removeFromCart(productId) {
+  state.cart = state.cart.filter(x=>x.product_id!==productId);
+  updateNav();
+  renderCart();
+}
+
+// ── CHECKOUT ──────────────────────────────────────────────────────────────
+async function startCheckout() {
+  if (!state.token) { navigate('login'); return; }
+  if (!state.cart.length) { navigate('cart'); return; }
+
+  // Sync cart to server first
+  await api('DELETE', '/cart/items/all').catch(()=>{});
+  for (const item of state.cart) {
+    await api('POST', '/cart/items', {product_id: item.product_id, quantity: item.quantity});
+  }
+
+  const r = await api('POST', '/checkout/init');
+  if (!r.success) { toast(r.error || 'Failed to start checkout', 'error'); return; }
+  state.checkoutId = r.data.checkout_id;
+  state.checkoutData = r.data;
+  state.checkoutStep = 1;
+  renderCheckoutStep();
+}
+
+function renderCheckoutStep() {
+  [1,2,3,4].forEach(n=>{
+    const el = document.getElementById('step-'+n);
+    el.classList.toggle('active', n === state.checkoutStep);
+    el.classList.toggle('done', n < state.checkoutStep);
+  });
+  const area = document.getElementById('checkout-form-area');
+  const subtotal = (state.checkoutData?.item_total) || state.cart.reduce((s,i)=>s+i.price*i.quantity,0);
+
+  if (state.checkoutStep === 1) {
+    area.innerHTML = `
+      <div class="card">
+        <div class="section-title" style="margin-bottom:16px">Shipping Address</div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">First Name</label><input class="form-input" id="co-fname" placeholder="First name"></div>
+          <div class="form-group"><label class="form-label">Last Name</label><input class="form-input" id="co-lname" placeholder="Last name"></div>
+        </div>
+        <div class="form-group"><label class="form-label">Street Address</label><input class="form-input" id="co-street" placeholder="Jl. Contoh No. 1"></div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">City</label><input class="form-input" id="co-city" placeholder="Jakarta"></div>
+          <div class="form-group"><label class="form-label">Postal Code</label><input class="form-input" id="co-zip" placeholder="12345"></div>
+        </div>
+        <div class="form-group"><label class="form-label">Phone</label><input class="form-input" id="co-phone" placeholder="08xxxxxxxxxx"></div>
+        <button class="btn-primary" onclick="coStep1()">Continue to Delivery</button>
+      </div>`;
+  } else if (state.checkoutStep === 2) {
+    area.innerHTML = `
+      <div class="card">
+        <div class="section-title" style="margin-bottom:16px">Delivery Method</div>
+        <div style="display:flex;flex-direction:column;gap:10px" id="shipping-options">
+          ${[['regular','Regular (3–5 days)','Rp 15.000'],['express','Express (1–2 days)','Rp 25.000'],['same_day','Same Day (today)','Rp 45.000']].map(([v,l,p])=>`
+          <label style="border:2px solid #e2e8f0;border-radius:10px;padding:14px 16px;cursor:pointer;display:flex;align-items:center;gap:12px;transition:border-color .15s" id="ship-opt-${v}">
+            <input type="radio" name="shipmethod" value="${v}" onchange="selectShipping('${v}')">
+            <div style="flex:1"><div style="font-weight:600;font-size:.9rem">${l}</div></div>
+            <div style="font-weight:700;color:#16a34a">${p}</div>
+          </label>`).join('')}
+        </div>
+        <div style="margin-top:8px" id="shipping-free-badge" style="display:none"></div>
+        <button class="btn-primary" style="margin-top:16px" onclick="coStep2()">Continue</button>
+        <button class="btn-secondary" onclick="state.checkoutStep=1;renderCheckoutStep()">Back</button>
+      </div>`;
+  } else if (state.checkoutStep === 3) {
+    area.innerHTML = `
+      <div class="card">
+        <div class="section-title" style="margin-bottom:16px">Vouchers & Offers</div>
+        <div class="form-group">
+          <label class="form-label">Voucher Code</label>
+          <div style="display:flex;gap:8px">
+            <input class="form-input" id="co-voucher" placeholder="Enter voucher code" style="flex:1">
+            <button onclick="applyVoucher()" style="background:#16a34a;color:#fff;padding:0 16px;border-radius:8px;font-weight:600;border:none">Apply</button>
+          </div>
+          <div id="voucher-result" style="margin-top:8px;font-size:.82rem"></div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Account Balance</label>
+          <div id="balance-info" style="font-size:.85rem;color:#64748b;margin-bottom:8px">Loading balance…</div>
+          <div style="display:flex;gap:8px">
+            <input class="form-input" id="co-balance" placeholder="Amount to use (Rp)" style="flex:1" type="number">
+            <button onclick="applyBalance()" style="background:#f97316;color:#fff;padding:0 16px;border-radius:8px;font-weight:600;border:none">Apply</button>
+          </div>
+          <div id="balance-result" style="margin-top:8px;font-size:.82rem"></div>
+        </div>
+        <button class="btn-primary" onclick="state.checkoutStep=4;renderCheckoutStep()">Continue to Payment</button>
+        <button class="btn-secondary" onclick="state.checkoutStep=2;renderCheckoutStep()">Back</button>
+      </div>`;
+    loadBalanceInfo();
+  } else if (state.checkoutStep === 4) {
+    area.innerHTML = `
+      <div class="card">
+        <div class="section-title" style="margin-bottom:16px">Payment</div>
+        <div class="alert alert-info" style="margin-bottom:16px">Complete your payment to place this order.</div>
+        <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px">
+          ${[['bank_transfer','Bank Transfer 🏦'],['credit_card','Credit/Debit Card 💳'],['e_wallet','E-Wallet 📱']].map(([v,l])=>`
+          <label style="border:2px solid #e2e8f0;border-radius:10px;padding:14px 16px;cursor:pointer;display:flex;align-items:center;gap:12px" id="pay-opt-${v}">
+            <input type="radio" name="paymethod" value="${v}" onchange="selectPayMethod('${v}')">
+            <div style="font-weight:600;font-size:.9rem">${l}</div>
+          </label>`).join('')}
+        </div>
+        <div id="pay-detail" style="display:none" class="alert alert-success">Payment initiated. Click Confirm to complete.</div>
+        <button class="btn-primary" id="btn-pay" onclick="doPayment()">Initiate Payment</button>
+        <button class="btn-secondary" onclick="state.checkoutStep=3;renderCheckoutStep()">Back</button>
+      </div>`;
+  }
+
+  renderCheckoutSummary();
+}
+
+function renderCheckoutSummary() {
+  const el = document.getElementById('checkout-summary-side');
+  const subtotal = state.checkoutData?.item_total || 0;
+  const shipping = state.checkoutData?.shipping_cost || 0;
+  const discount = state.checkoutData?.discount_amount || 0;
+  const balanceApplied = state.checkoutData?.balance_applied || 0;
+  const total = state.checkoutData?.total || (subtotal + shipping - discount - balanceApplied);
+  el.innerHTML = `
+    <div class="section-title" style="margin-bottom:12px">Your Order</div>
+    ${(state.cart||[]).map(i=>`<div style="display:flex;justify-content:space-between;font-size:.82rem;padding:4px 0;color:#475569"><span>${i.name} ×${i.quantity}</span><span>${fmtRp(i.price*i.quantity)}</span></div>`).join('')}
+    <div style="border-top:1px solid #f1f5f9;margin:10px 0"></div>
+    <div class="summary-row"><span>Subtotal</span><span>${fmtRp(subtotal)}</span></div>
+    <div class="summary-row"><span>Shipping</span><span>${shipping===0?'<span style="color:#16a34a">Free</span>':fmtRp(shipping)}</span></div>
+    ${discount?`<div class="summary-row" style="color:#16a34a"><span>Discount</span><span>−${fmtRp(discount)}</span></div>`:''}
+    ${balanceApplied?`<div class="summary-row" style="color:#f97316"><span>Balance applied</span><span>−${fmtRp(balanceApplied)}</span></div>`:''}
+    <div class="summary-row total"><span>Total</span><span>${fmtRp(total)}</span></div>`;
+}
+
+async function coStep1() {
+  const fname = document.getElementById('co-fname').value.trim();
+  const lname = document.getElementById('co-lname').value.trim();
+  const street = document.getElementById('co-street').value.trim();
+  const city = document.getElementById('co-city').value.trim();
+  const zip = document.getElementById('co-zip').value.trim();
+  const phone = document.getElementById('co-phone').value.trim();
+  if (!fname||!street||!city) { toast('Please fill in all required fields','error'); return; }
+  const r = await api('PUT', '/checkout/shipping-address', {
+    checkout_id: state.checkoutId,
+    recipient_name: fname+' '+lname, full_address: street, city, postal_code: zip, phone
+  });
+  if (!r.success) { toast(r.error||'Error','error'); return; }
+  state.checkoutStep = 2;
+  renderCheckoutStep();
+}
+
+function selectShipping(method) {
+  document.querySelectorAll('[id^="ship-opt-"]').forEach(el => el.style.borderColor='#e2e8f0');
+  document.getElementById('ship-opt-'+method).style.borderColor='#16a34a';
+  state._selectedShipping = method;
+}
+
+async function coStep2() {
+  if (!state._selectedShipping) { toast('Please select a delivery method','error'); return; }
+  const r = await api('PUT', '/checkout/shipping-method', {
+    checkout_id: state.checkoutId, method: state._selectedShipping
+  });
+  if (!r.success) { toast(r.error||'Error','error'); return; }
+  if (r.data) {
+    state.checkoutData = Object.assign(state.checkoutData||{}, r.data);
+  }
+  state.checkoutStep = 3;
+  renderCheckoutStep();
+}
+
+async function loadBalanceInfo() {
+  const r = await api('GET', '/buyer/points');
+  if (r.success && r.data) {
+    document.getElementById('balance-info').innerHTML = `Available: <strong style="color:#f97316">${fmtRp(r.data.balance||0)}</strong>`;
+  }
+}
+
+async function applyVoucher() {
+  const code = document.getElementById('co-voucher').value.trim();
+  if (!code) return;
+  const r = await api('POST', '/checkout/apply-voucher', {checkout_id: state.checkoutId, voucher_code: code});
+  const el = document.getElementById('voucher-result');
+  if (r.success) {
+    el.style.color='#16a34a';
+    el.textContent = '✓ Voucher applied! ' + (r.data?.discount_amount ? '−'+fmtRp(r.data.discount_amount) : '');
+    if (r.data) state.checkoutData = Object.assign(state.checkoutData||{}, r.data);
+    renderCheckoutSummary();
+  } else {
+    el.style.color='#ef4444';
+    el.textContent = r.error || 'Invalid voucher';
+  }
+}
+
+async function applyBalance() {
+  const amount = parseInt(document.getElementById('co-balance').value||'0');
+  if (!amount) return;
+  const body = {amount};
+  if (state.checkoutId) body.checkout_id = state.checkoutId;
+  const r = await api('POST', '/checkout/apply-balance', body);
+  const el = document.getElementById('balance-result');
+  if (r.success) {
+    el.style.color='#16a34a';
+    el.textContent = '✓ Balance applied: −' + fmtRp(amount);
+    if (r.data) {
+      state.checkoutData = Object.assign(state.checkoutData||{}, r.data);
+      if (r.data.checkout_id && !state.checkoutId) state.checkoutId = r.data.checkout_id;
+    }
+    renderCheckoutSummary();
+  } else {
+    el.style.color='#ef4444';
+    el.textContent = r.error || 'Could not apply balance';
+  }
+}
+
+function selectPayMethod(method) {
+  document.querySelectorAll('[id^="pay-opt-"]').forEach(el=>el.style.borderColor='#e2e8f0');
+  document.getElementById('pay-opt-'+method).style.borderColor='#16a34a';
+  state._payMethod = method;
+}
+
+async function doPayment() {
+  const btn = document.getElementById('btn-pay');
+  if (btn.textContent === 'Place Order') {
+    const r = await api('POST', '/checkout/confirm', {checkout_id: state.checkoutId});
+    if (!r.success) { toast(r.error||'Order failed','error'); return; }
+    state.currentOrderId = r.data?.order_id;
+    state.cart = [];
+    updateNav();
+    document.getElementById('success-order-id').textContent = 'Order #' + state.currentOrderId;
+    navigate('order-success');
+    return;
+  }
+  if (!state._payMethod) { toast('Select a payment method','error'); return; }
+  const r = await api('POST', '/checkout/payment/initiate', {checkout_id: state.checkoutId, payment_method: state._payMethod});
+  if (!r.success) { toast(r.error||'Error','error'); return; }
+  state._paymentId = r.data?.payment_id;
+  // Confirm payment
+  const r2 = await api('POST', '/checkout/payment/confirm', {checkout_id: state.checkoutId, payment_id: state._paymentId});
+  if (!r2.success) { toast(r2.error||'Payment confirmation failed','error'); return; }
+  document.getElementById('pay-detail').style.display='block';
+  btn.textContent = 'Place Order';
+  btn.style.background='#f97316';
+  toast('Payment confirmed! Click Place Order to complete.','success');
+  renderCheckoutSummary();
+}
+
+// ── AUTH ──────────────────────────────────────────────────────────────────
+async function doRegister() {
+  const r = await api('POST', '/auth/register', {
+    name: document.getElementById('reg-name').value,
+    email: document.getElementById('reg-email').value,
+    phone: document.getElementById('reg-phone').value,
+    password: document.getElementById('reg-password').value,
+  });
+  if (!r.success) { toast(r.error||'Registration failed','error'); return; }
+  state.token = r.data.token;
+  localStorage.setItem('wk_token', state.token);
+  state.pendingOtp = r.data.otp;
+  document.getElementById('otp-hint-email').textContent = 'Your code: ' + r.data.otp;
+  navigate('verify-email');
+  toast('Account created! Verify your email.','success');
+}
+
+async function doVerifyEmail() {
+  const r = await api('POST', '/auth/verify-email', {otp: document.getElementById('otp-email').value});
+  if (!r.success) { toast(r.error||'Invalid code','error'); return; }
+  toast('Email verified!','success');
+  navigate('complete-profile');
+}
+
+async function doCompleteProfile() {
+  const r = await api('POST', '/auth/complete-profile', {
+    date_of_birth: document.getElementById('cp-dob').value,
+    full_address: document.getElementById('cp-address').value,
+    city: document.getElementById('cp-city').value,
+    postal_code: document.getElementById('cp-postal').value,
+  });
+  if (!r.success) { toast(r.error||'Error','error'); return; }
+  // Claim welcome bonus
+  const r2 = await api('POST', '/auth/claim-welcome-bonus');
+  if (r2.success) toast('🎁 Welcome bonus claimed — Rp 20,000 voucher awarded!','success');
+  await loadMe();
+  navigate('select-role');
+}
+
+async function doSelectRole(role) {
+  const r = await api('POST', '/auth/select-role', {role});
+  if (!r.success) { toast(r.error||'Error','error'); return; }
+  state.user.role = role;
+  updateNav();
+  navigate('home');
+  toast('Welcome to WarungKu!','success');
+}
+
+async function doLogin() {
+  const r = await api('POST', '/auth/login', {
+    email: document.getElementById('login-email').value,
+    password: document.getElementById('login-password').value,
+  });
+  if (!r.success) { toast(r.error||'Login failed','error'); return; }
+  state.token = r.data.token;
+  localStorage.setItem('wk_token', state.token);
+  state.pendingOtp2fa = r.data.otp;
+  document.getElementById('otp-hint-2fa').textContent = 'Your code: ' + r.data.otp;
+  navigate('verify-2fa');
+}
+
+async function do2FA() {
+  const r = await api('POST', '/auth/verify-2fa', {otp: document.getElementById('otp-2fa').value});
+  if (!r.success) { toast(r.error||'Invalid code','error'); return; }
+  await loadMe();
+  navigate('home');
+  toast('Welcome back, ' + (state.user?.name||'') + '!','success');
+}
+
+async function loadMe() {
+  const r = await api('GET', '/auth/me');
+  if (r.success) { 
+    state.user = r.data; 
+    const cr = await api('GET', '/cart');
+    if (cr.success && cr.data.items) {
+      state.cart = cr.data.items;
+    }
+    updateNav(); 
+  }
+}
+
+// ── ACCOUNT ───────────────────────────────────────────────────────────────
+async function loadAccount(tab) {
+  if (!state.user) await loadMe();
+  if (!state.user) { navigate('login'); return; }
+  document.querySelectorAll('.account-nav-item').forEach(el=>el.classList.remove('active'));
+  const activeTab = tab||'overview';
+  document.getElementById('atab-'+activeTab)?.classList.add('active');
+  await renderAccountTab(activeTab);
+}
+
+async function showAccountTab(tab) {
+  document.querySelectorAll('.account-nav-item').forEach(el=>el.classList.remove('active'));
+  document.getElementById('atab-'+tab)?.classList.add('active');
+  await renderAccountTab(tab);
+}
+
+async function renderAccountTab(tab) {
+  const content = document.getElementById('account-content');
+  if (tab === 'overview') {
+    const r = await api('GET', '/dashboard');
+    const d = r.data || {};
+    content.innerHTML = `
+      <div class="section-title">Hello, ${state.user?.name||''}!</div>
+      <div class="stat-grid">
+        <div class="stat-card"><div class="stat-label">Account Balance</div><div class="stat-value green">${fmtRp(d.user?.balance||0)}</div></div>
+        <div class="stat-card"><div class="stat-label">Loyalty Points</div><div class="stat-value orange">${d.user?.loyalty_points||0} pts</div></div>
+        <div class="stat-card"><div class="stat-label">Total Orders</div><div class="stat-value">${d.stats?.total_orders||0}</div></div>
+      </div>
+      <div class="card" style="margin-bottom:16px">
+        <div style="font-weight:700;margin-bottom:10px">Account Details</div>
+        <div style="font-size:.875rem;color:#475569;display:flex;flex-direction:column;gap:6px">
+          <div><strong>Email:</strong> ${state.user?.email||''}</div>
+          <div><strong>Phone:</strong> ${state.user?.phone||''}</div>
+          <div><strong>Role:</strong> <span style="text-transform:capitalize">${state.user?.role||'—'}</span></div>
+          <div><strong>Membership:</strong> <span style="color:#16a34a;font-weight:600;text-transform:capitalize">${d.subscription?.plan||'Basic'}</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div style="font-weight:700;margin-bottom:12px">Edit Profile</div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Name</label><input class="form-input" id="ep-name" placeholder="Full name" value="${state.user?.name||''}"></div>
+          <div class="form-group"><label class="form-label">Phone</label><input class="form-input" id="ep-phone" placeholder="08xxxxxxxxxx" value="${state.user?.phone||''}"></div>
+        </div>
+        <div class="form-group"><label class="form-label">City</label><input class="form-input" id="ep-city" placeholder="City"></div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Postal Code</label><input class="form-input" id="ep-postal" placeholder="12345"></div>
+          <div class="form-group"><label class="form-label">Date of Birth</label><input class="form-input" id="ep-dob" type="date"></div>
+        </div>
+        <button onclick="doEditProfile()" style="background:#16a34a;color:#fff;padding:10px 20px;border-radius:8px;font-weight:600;border:none;font-size:.9rem">Save Changes</button>
+      </div>`;
+  } else if (tab === 'orders') {
+    const r = await api('GET', '/buyer/history');
+    const orders = r.data?.orders || [];
+    const pr = await api('GET', '/buyer/points');
+    const pts = pr.data || {};
+    content.innerHTML = `<div class="section-title">My Orders</div>
+      <div class="stat-grid" style="grid-template-columns:1fr 1fr;margin-bottom:16px">
+        <div class="stat-card"><div class="stat-label">Loyalty Points</div><div class="stat-value orange" id="orders-pts-display">${pts.loyalty_points||0} pts</div></div>
+        <div class="stat-card"><div class="stat-label">Account Balance</div><div class="stat-value green" id="orders-bal-display">${fmtRp(pts.balance||0)}</div></div>
+      </div>
+      <div class="orders-list">` +
+      (orders.length ? orders.map(o=>`
+        <div class="order-card">
+          <div class="order-head" onclick="openOrderDetail('${o.id}')"><div class="order-id">#${o.id}</div><div class="order-date">${fmtDate(o.created_at)}</div></div>
+          <div class="order-items" onclick="openOrderDetail('${o.id}')">${(o.items||[]).map(i=>i.name).join(', ')}</div>
+          <div class="order-foot">
+            <div style="display:flex;align-items:center;gap:8px">
+              <div class="order-total">${fmtRp(o.total)}</div>
+              <span class="status-badge status-${o.status}">${o.status}</span>
+            </div>
+            ${o.status==='processing'?`<button onclick="cancelOrder('${o.id}')" style="background:#fee2e2;color:#b91c1c;border:none;padding:4px 12px;border-radius:6px;font-size:.78rem;font-weight:600;cursor:pointer">Cancel Order</button>`:''}
+          </div>
+        </div>`).join('') : '<div class="empty-state"><div class="empty-icon">📦</div><div class="empty-title">No orders yet</div></div>') + '</div>';
+  } else if (tab === 'vouchers') {
+    const r = await api('GET', '/buyer/vouchers');
+    const vouchers = r.data?.vouchers || [];
+    content.innerHTML = `<div class="section-title">My Vouchers</div>` +
+      (vouchers.length ? vouchers.map(v=>`
+        <div class="voucher-card">
+          <div class="voucher-icon">🎟</div>
+          <div class="voucher-info">
+            <div class="voucher-code">${v.code||v.id}</div>
+            <div class="voucher-desc">${v.description||'Discount voucher'}</div>
+            <div class="voucher-exp">Status: ${v.status} ${v.expires_at?'· Exp: '+fmtDate(v.expires_at):''}</div>
+          </div>
+          <div class="voucher-val">${fmtRp(v.discount_amount||0)}</div>
+        </div>`).join('') : '<div class="empty-state"><div class="empty-icon">🎟</div><div class="empty-title">No vouchers</div></div>');
+  } else if (tab === 'points') {
+    const r = await api('GET', '/buyer/points');
+    const d = r.data || {};
+    content.innerHTML = `
+      <div class="section-title">Points & Balance</div>
+      <div class="stat-grid">
+        <div class="stat-card"><div class="stat-label">Loyalty Points</div><div class="stat-value orange">${d.loyalty_points||0}</div></div>
+        <div class="stat-card"><div class="stat-label">Account Balance</div><div class="stat-value green">${fmtRp(d.balance||0)}</div></div>
+      </div>
+      <div class="alert alert-info">Earn 10 points for every Rp 100,000 spent. Balance can be used at checkout.</div>`;
+  } else if (tab === 'returns') {
+    const r = await api('GET', '/returns');
+    const returns = r.data?.returns || [];
+    content.innerHTML = `
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <div class="section-title" style="margin-bottom:0">Returns & Refunds</div>
+        <button onclick="showReturnForm()" style="background:#16a34a;color:#fff;padding:8px 16px;border-radius:8px;font-size:.85rem;font-weight:600;border:none">+ New Return</button>
+      </div>
+      <div id="return-form-area"></div>` +
+      (returns.length ? returns.map(ret=>`
+        <div class="order-card" style="cursor:default;margin-bottom:10px">
+          <div class="order-head"><div class="order-id">Return #${ret.id}</div><span class="status-badge status-${ret.status}">${ret.status}</span></div>
+          <div class="order-items">Order: #${ret.order_id} · ${ret.reason}</div>
+          <div class="order-foot"><div style="font-size:.82rem;color:#94a3b8">${fmtDate(ret.created_at)}</div>
+            ${ret.status==='approved'&&!ret.refund_processed?`<button onclick="processRefund('${ret.id}')" class="action-btn success">Process Refund</button>`:''}
+            ${ret.refund_processed?`<span style="font-size:.82rem;color:#16a34a;font-weight:600">✓ Refunded ${fmtRp(ret.refund_amount||0)}</span>`:''}
+          </div>
+        </div>`).join('') : '<div class="empty-state"><div class="empty-icon">↩️</div><div class="empty-title">No returns</div></div>');
+  } else if (tab === 'seller') {
+    if (!state.user?.role || state.user.role !== 'seller') {
+      content.innerHTML = '<div class="alert alert-warn">This section is for sellers only. Update your role in settings.</div>'; return;
+    }
+    await renderSellerHub(content);
+  } else if (tab === 'admin') {
+    await renderAdminPanel(content);
+  }
+}
+
+async function renderSellerHub(content) {
+  const [pr, or] = await Promise.all([api('GET','/seller/products'), api('GET','/seller/orders')]);
+  const products = pr.data?.products||[];
+  const orders = or.data?.orders||[];
+  content.innerHTML = `
+    <div class="section-title">Seller Hub</div>
+    <div class="tab-bar">
+      <div class="tab active" id="sh-tab-p" onclick="toggleSellerTab('products')">Products (${products.length})</div>
+      <div class="tab" id="sh-tab-o" onclick="toggleSellerTab('orders')">Orders (${orders.length})</div>
+      <div class="tab" id="sh-tab-a" onclick="toggleSellerTab('add')">+ Add Product</div>
+    </div>
+    <div id="sh-content">
+      <table class="data-table"><thead><tr><th>ID</th><th>Name</th><th>Price</th><th>Category</th><th>Stock</th></tr></thead>
+      <tbody>${products.map(p=>`<tr><td>${p.id}</td><td>${p.name}</td><td>${fmtRp(p.price)}</td><td>${p.category}</td><td>${p.stock??'—'}</td></tr>`).join('')||'<tr><td colspan="5" style="text-align:center;color:#94a3b8;padding:20px">No products</td></tr>'}</tbody></table>
+    </div>`;
+  window._sellerOrders = orders;
+  window._sellerProducts = products;
+}
+
+function toggleSellerTab(tab) {
+  ['products','orders','add'].forEach(t=>document.getElementById('sh-tab-'+t[0])?.classList.remove('active'));
+  document.getElementById('sh-tab-'+tab[0])?.classList.add('active');
+  const c = document.getElementById('sh-content');
+  if (tab==='products') {
+    c.innerHTML = `<table class="data-table"><thead><tr><th>ID</th><th>Name</th><th>Price</th><th>Category</th></tr></thead><tbody>${(window._sellerProducts||[]).map(p=>`<tr><td>${p.id}</td><td>${p.name}</td><td>${fmtRp(p.price)}</td><td>${p.category}</td></tr>`).join('')}</tbody></table>`;
+  } else if (tab==='orders') {
+    c.innerHTML = `<table class="data-table"><thead><tr><th>Order</th><th>Date</th><th>Customer</th><th>Total</th><th>Status</th><th>Action</th></tr></thead><tbody>${(window._sellerOrders||[]).map(o=>`<tr><td>#${o.id}</td><td>${fmtDate(o.created_at)}</td><td>${o.user_id}</td><td>${fmtRp(o.total)}</td><td><span class="status-badge status-${o.status}">${o.status}</span></td><td><select onchange="updateOrderStatus('${o.id}',this.value)" style="font-size:.78rem;padding:3px 6px;border:1px solid #e2e8f0;border-radius:4px"><option value="">Update</option><option>processing</option><option>shipped</option><option>delivered</option><option>cancelled</option></select></td></tr>`).join('')||'<tr><td colspan="6" style="text-align:center;color:#94a3b8;padding:20px">No orders</td></tr>'}</tbody></table>`;
+  } else {
+    c.innerHTML = `
+      <div class="card" style="max-width:480px">
+        <div style="font-weight:700;margin-bottom:16px">Add New Product</div>
+        <div class="form-group"><label class="form-label">Product Name</label><input class="form-input" id="np-name" placeholder="e.g. Nasi Uduk"></div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Price (Rp)</label><input class="form-input" id="np-price" type="number" placeholder="25000"></div>
+          <div class="form-group"><label class="form-label">Stock</label><input class="form-input" id="np-stock" type="number" placeholder="100"></div>
+        </div>
+        <div class="form-group"><label class="form-label">Category</label><select class="form-select" id="np-cat"><option value="food">Food</option><option value="drink">Drink</option><option value="household">Household</option><option value="grocery">Grocery</option></select></div>
+        <div class="form-group"><label class="form-label">Description</label><textarea class="form-input" id="np-desc" rows="2"></textarea></div>
+        <button class="btn-primary" onclick="addProduct()">Create Product</button>
+      </div>`;
+  }
+}
+
+async function addProduct() {
+  const r = await api('POST', '/products', {
+    name: document.getElementById('np-name').value,
+    price: parseInt(document.getElementById('np-price').value||0),
+    stock: parseInt(document.getElementById('np-stock').value||0),
+    category: document.getElementById('np-cat').value,
+    description: document.getElementById('np-desc').value,
+  });
+  if (!r.success) { toast(r.error||'Error','error'); return; }
+  toast('Product created!','success');
+  allProducts = [];
+}
+
+async function updateOrderStatus(orderId, status) {
+  if (!status) return;
+  const r = await api('PUT', '/orders/'+orderId+'/status', {status});
+  if (!r.success) { toast(r.error||'Error','error'); return; }
+  toast('Status updated to ' + status,'success');
+}
+
+async function renderAdminPanel(content) {
+  const [ur, rr, rev] = await Promise.all([api('GET','/admin/users'), api('GET','/returns'), api('GET','/admin/revenue')]);
+  const users = ur.data?.users||[];
+  const returns = rr.data?.returns||[];
+  const revenue = rev.data||{};
+  content.innerHTML = `
+    <div class="section-title">Admin Panel</div>
+    <div class="stat-grid" style="grid-template-columns:repeat(4,1fr)">
+      <div class="stat-card"><div class="stat-label">Total Revenue</div><div class="stat-value green">${fmtRp(revenue.total_revenue||0)}</div></div>
+      <div class="stat-card"><div class="stat-label">Total Orders</div><div class="stat-value">${revenue.total_orders||0}</div></div>
+      <div class="stat-card"><div class="stat-label">Total Users</div><div class="stat-value">${users.length}</div></div>
+      <div class="stat-card"><div class="stat-label">Pending Returns</div><div class="stat-value orange">${returns.filter(r=>r.status==='pending').length}</div></div>
+    </div>
+    <div class="tab-bar">
+      <div class="tab active" id="adm-tab-u" onclick="adminTab('users')">Users</div>
+      <div class="tab" id="adm-tab-r" onclick="adminTab('returns')">Returns</div>
+    </div>
+    <div id="adm-content">
+      <table class="data-table"><thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Balance</th><th>Action</th></tr></thead>
+      <tbody>${users.map(u=>`<tr><td>${u.name}</td><td>${u.email}</td><td>${u.role||'—'}</td><td>${fmtRp(u.balance||0)}</td><td><button class="action-btn danger" onclick="deleteUser('${u.id}')">Delete</button></td></tr>`).join('')}</tbody></table>
+    </div>`;
+  window._adminUsers = users; window._adminReturns = returns;
+}
+
+function adminTab(tab) {
+  ['users','returns'].forEach(t=>document.getElementById('adm-tab-'+t[0])?.classList.remove('active'));
+  document.getElementById('adm-tab-'+tab[0])?.classList.add('active');
+  const c = document.getElementById('adm-content');
+  if (tab==='users') {
+    c.innerHTML = `<table class="data-table"><thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Balance</th><th>Action</th></tr></thead><tbody>${(window._adminUsers||[]).map(u=>`<tr><td>${u.name}</td><td>${u.email}</td><td>${u.role||'—'}</td><td>${fmtRp(u.balance||0)}</td><td><button class="action-btn danger" onclick="deleteUser('${u.id}')">Delete</button></td></tr>`).join('')}</tbody></table>`;
+  } else {
+    c.innerHTML = `<table class="data-table"><thead><tr><th>ID</th><th>Order</th><th>Reason</th><th>Status</th><th>Actions</th></tr></thead><tbody>${(window._adminReturns||[]).map(ret=>`<tr><td>${ret.id}</td><td>#${ret.order_id}</td><td>${ret.reason}</td><td><span class="status-badge status-${ret.status}">${ret.status}</span></td><td style="display:flex;gap:4px">${ret.status==='pending'?`<button class="action-btn success" onclick="adminReturn('${ret.id}','approve')">Approve</button><button class="action-btn danger" onclick="adminReturn('${ret.id}','reject')">Reject</button>`:'—'}</td></tr>`).join('')||'<tr><td colspan="5" style="text-align:center;color:#94a3b8;padding:20px">No returns</td></tr>'}</tbody></table>`;
+  }
+}
+
+async function deleteUser(id) {
+  if (!confirm('Delete this user?')) return;
+  const r = await api('DELETE', '/admin/users/'+id);
+  if (!r.success) { toast(r.error||'Error','error'); return; }
+  toast('User deleted','success');
+  renderAccountTab('admin');
+}
+
+async function adminReturn(id, action) {
+  let body = {};
+  if (action === 'approve') {
+    const amt = prompt('Refund amount (Rp):');
+    if (!amt) return;
+    body = {refund_amount: parseInt(amt)};
+  }
+  const r = await api('PUT', '/returns/'+id+'/'+action, body);
+  if (!r.success) { toast(r.error||'Error','error'); return; }
+  toast('Return ' + action + 'd', 'success');
+  renderAccountTab('admin');
+}
+
+async function processRefund(id) {
+  const r = await api('POST', '/returns/'+id+'/process-refund');
+  if (!r.success) { toast(r.error||'Error','error'); return; }
+  toast('Refund processed!','success');
+  renderAccountTab('returns');
+}
+
+function showReturnForm() {
+  const area = document.getElementById('return-form-area');
+  area.innerHTML = `
+    <div class="card" style="margin-bottom:16px">
+      <div style="font-weight:700;margin-bottom:12px">Submit Return Request</div>
+      <div class="form-group"><label class="form-label">Order ID</label><input class="form-input" id="ret-order" placeholder="ORD-XXXXXX"></div>
+      <div class="form-group"><label class="form-label">Reason</label><textarea class="form-input" id="ret-reason" rows="2" placeholder="Describe the issue"></textarea></div>
+      <div class="form-group"><label class="form-label">Description</label><textarea class="form-input" id="ret-desc" rows="2" placeholder="Additional details"></textarea></div>
+      <div style="display:flex;gap:8px">
+        <button class="btn-primary" style="flex:1" onclick="submitReturn()">Submit Return</button>
+        <button class="btn-secondary" style="flex:1" onclick="document.getElementById('return-form-area').innerHTML=''">Cancel</button>
+      </div>
+    </div>`;
+}
+
+async function submitReturn() {
+  const r = await api('POST', '/returns/submit', {
+    order_id: document.getElementById('ret-order').value,
+    reason: document.getElementById('ret-reason').value,
+    description: document.getElementById('ret-desc').value,
+  });
+  if (!r.success) { toast(r.error||'Error','error'); return; }
+  toast('Return submitted successfully','success');
+  document.getElementById('return-form-area').innerHTML='';
+  renderAccountTab('returns');
+}
+
+// ── ORDER DETAIL ──────────────────────────────────────────────────────────
+async function openOrderDetail(id) {
+  const r = await api('GET', '/orders/'+id);
+  if (!r.success) { toast('Order not found','error'); return; }
+  const o = r.data.order;
+  const pr = await api('GET', '/buyer/points');
+  const bal = pr.data?.balance || 0;
+  document.getElementById('order-detail-content').innerHTML = `
+    <div class="card" style="margin-bottom:16px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+        <div><div style="font-size:1.1rem;font-weight:800">Order #${o.id}</div><div style="font-size:.82rem;color:#94a3b8">${fmtDate(o.created_at)}</div></div>
+        <span class="status-badge status-${o.status}">${o.status}</span>
+      </div>
+      <div class="section-title" style="font-size:.9rem;margin-bottom:8px">Items</div>
+      ${(o.items||[]).map(i=>`<div class="cart-item"><div class="ci-img">${getProductImage(allProducts.find(p=>p.id===i.product_id))}</div><div class="ci-info"><div class="ci-name">${i.name}</div><div class="ci-price">×${i.quantity}</div></div><div class="ci-total">${fmtRp(i.price*i.quantity)}</div></div>`).join('')}
+      <div style="border-top:1px solid #f1f5f9;margin-top:12px;padding-top:12px">
+        <div class="summary-row"><span>Subtotal</span><span>${fmtRp(o.item_total||0)}</span></div>
+        <div class="summary-row"><span>Shipping</span><span>${fmtRp(o.shipping_cost||0)}</span></div>
+        ${o.voucher_discount?`<div class="summary-row" style="color:#16a34a"><span>Voucher Discount</span><span>−${fmtRp(o.voucher_discount)}</span></div>`:''}
+        ${o.subscription_discount?`<div class="summary-row" style="color:#16a34a"><span>Member Discount</span><span>−${fmtRp(o.subscription_discount)}</span></div>`:''}
+        ${o.balance_applied?`<div class="summary-row" style="color:#f97316"><span>Balance Applied</span><span>−${fmtRp(o.balance_applied)}</span></div>`:''}
+        <div class="summary-row total"><span>Total</span><span>${fmtRp(o.total||0)}</span></div>
+      </div>
+    </div>
+    ${o.shipping_address?`<div class="card" style="margin-bottom:16px"><div style="font-weight:700;margin-bottom:8px">Delivery Address</div><div style="font-size:.875rem;color:#475569">${o.shipping_address.recipient_name||''}<br>${o.shipping_address.full_address||''}<br>${o.shipping_address.city||''} ${o.shipping_address.postal_code||''}</div></div>`:''}
+    <div class="card">
+      <div style="font-weight:700;margin-bottom:8px">Status Management</div>
+      <div style="font-size:.82rem;color:#64748b;margin-bottom:10px">Account Balance: <strong style="color:#16a34a" id="det-balance">${fmtRp(bal)}</strong></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        ${['processing','shipped','delivered','cancelled'].map(s=>`<button onclick="changeOrderStatus('${o.id}','${s}')" style="padding:6px 14px;border-radius:6px;font-size:.8rem;font-weight:600;border:2px solid ${s==='cancelled'?'#b91c1c':'#e2e8f0'};background:${s===o.status?'#16a34a':'#fff'};color:${s===o.status?'#fff':s==='cancelled'?'#b91c1c':'#475569'};cursor:pointer">${s}</button>`).join('')}
+      </div>
+    </div>`;
+  navigate('order-detail');
+}
+
+async function changeOrderStatus(orderId, status) {
+  const r = await api('PUT', '/orders/'+orderId+'/status', {status});
+  if (!r.success) { toast(r.error||'Error','error'); return; }
+  toast('Status set to '+status, 'success');
+  openOrderDetail(orderId);
+}
+
+// ── MEMBERSHIP ────────────────────────────────────────────────────────────
+async function loadMembership() {
+  const [pr, sr] = await Promise.all([api('GET','/subscriptions/plans'), api('GET','/subscriptions/status')]);
+  const plans = pr.data?.plans||[];
+  const sub = sr.data||{};
+  const feats = {
+    basic: ['Standard product access','Order tracking'],
+    premium: ['Free shipping on all orders','10% off every order','Priority customer support','Access to exclusive deals'],
+    enterprise: ['Everything in Premium','Bulk ordering discounts','API access for integrations','Dedicated account manager'],
+  };
+  document.getElementById('plan-grid').innerHTML = plans.map(p=>{
+    const isCurrent = sub.plan === p.id && sub.active;
+    return `<div class="plan-card ${p.id==='premium'?'featured':''} ${isCurrent?'current':''}">
+      ${p.id==='premium'?'<div class="plan-badge">Most Popular</div>':''}
+      <div class="plan-name">${p.name}</div>
+      <div class="plan-price">${p.price>0?fmtRp(p.price)+'<small>/mo</small>':'<small>Free</small>'}</div>
+      <div class="plan-features">${(feats[p.id]||[]).map(f=>`<div class="plan-feat">${f}</div>`).join('')}</div>
+      <button class="btn-plan ${isCurrent?'active':''}" onclick="selectPlan('${p.id}')">${isCurrent?'Current Plan':'Select Plan'}</button>
+    </div>`;
+  }).join('');
+
+  const statusCard = document.getElementById('sub-status-card');
+  if (sub.active) {
+    statusCard.style.display = 'block';
+    statusCard.innerHTML = `
+      <div class="alert alert-success" style="margin-bottom:0">
+        <strong>Active Membership:</strong> ${sub.plan_name||sub.plan} plan · Expires ${fmtDate(sub.expires_at)}
+      </div>`;
+  }
+}
+
+async function selectPlan(planId) {
+  if (!state.token) { navigate('login'); return; }
+  const r = await api('POST', '/subscriptions/select', {plan_id: planId});
+  if (!r.success) { toast(r.error||'Error','error'); return; }
+  state.selectedPlan = planId;
+  if (planId === 'basic') {
+    await api('POST', '/subscriptions/activate');
+    toast('Basic plan activated!','success');
+    loadMembership();
+    return;
+  }
+  const payCard = document.getElementById('sub-payment-card');
+  payCard.style.display = 'block';
+  payCard.innerHTML = `
+    <div style="font-weight:700;margin-bottom:12px">Complete Payment</div>
+    <div class="alert alert-info" style="margin-bottom:12px">Plan: <strong style="text-transform:capitalize">${planId}</strong></div>
+    <div class="form-group"><label class="form-label">Payment Method</label>
+      <select class="form-select" id="sub-pay-method"><option value="bank_transfer">Bank Transfer</option><option value="credit_card">Card</option><option value="e_wallet">E-Wallet</option></select>
+    </div>
+    <button class="btn-primary" onclick="paySubscription()">Pay & Activate</button>`;
+  payCard.scrollIntoView({behavior:'smooth'});
+}
+
+async function paySubscription() {
+  const method = document.getElementById('sub-pay-method').value;
+  const r1 = await api('POST', '/subscriptions/payment/initiate', {payment_method: method});
+  if (!r1.success) { toast(r1.error||'Error','error'); return; }
+  const payId = r1.data?.payment_id;
+  const r2 = await api('POST', '/subscriptions/payment/confirm', {payment_id: payId});
+  if (!r2.success) { toast(r2.error||'Error','error'); return; }
+  const r3 = await api('POST', '/subscriptions/activate');
+  if (!r3.success) { toast(r3.error||'Error','error'); return; }
+  toast('Membership activated!','success');
+  document.getElementById('sub-payment-card').style.display='none';
+  loadMembership();
+}
+
+// ── GIFT CARDS ────────────────────────────────────────────────────────────
+async function loadGiftCards(tab) {
+  const r = await api('GET', '/gift-cards/denominations');
+  const denoms = r.data?.denominations||[50000,100000,200000,500000];
+  state._gcDenoms = denoms;
+  gcTab(tab, document.querySelector('.tab.active'));
+}
+
+function gcTab(tab, el) {
+  document.querySelectorAll('#page-gift-cards .tab').forEach(t=>t.classList.remove('active'));
+  if (el) el.classList.add('active');
+  const c = document.getElementById('gc-content');
+  if (tab==='buy') {
+    c.innerHTML = `
+      <div class="card" style="max-width:480px">
+        <div class="section-title" style="margin-bottom:16px">Choose Amount</div>
+        <div class="gc-denom-grid" id="gc-denom-grid">
+          ${(state._gcDenoms||[50000,100000,200000,500000]).map(d=>`<div class="gc-denom" onclick="selectDenom(${d},this)"><div class="gc-denom-amount">${fmtRp(d)}</div><div class="gc-denom-label">Gift Card</div></div>`).join('')}
+        </div>
+        <div class="form-group"><label class="form-label">Recipient Email (optional)</label><input class="form-input" id="gc-recipient" placeholder="Leave blank for yourself"></div>
+        <div class="form-group"><label class="form-label">Message (optional)</label><input class="form-input" id="gc-message" placeholder="Happy birthday!"></div>
+        <button class="btn-primary" onclick="purchaseGiftCard()">Purchase Gift Card</button>
+      </div>
+      <div id="gc-purchase-result" style="margin-top:16px;max-width:480px"></div>`;
+  } else if (tab==='my') {
+    loadMyGiftCards(c);
+  } else if (tab==='redeem') {
+    c.innerHTML = `
+      <div class="card" style="max-width:400px">
+        <div class="section-title" style="margin-bottom:16px">Redeem a Gift Card</div>
+        <div class="form-group"><label class="form-label">Gift Card Code</label><input class="form-input" id="gc-redeem-code" placeholder="XXXXXXXX" style="letter-spacing:2px;text-transform:uppercase"></div>
+        <button class="btn-primary" onclick="redeemGiftCard()">Redeem to Balance</button>
+        <div id="gc-redeem-result" style="margin-top:12px;font-size:.875rem"></div>
+      </div>`;
+  } else if (tab==='transfer') {
+    c.innerHTML = `
+      <div class="card" style="max-width:400px">
+        <div class="section-title" style="margin-bottom:16px">Transfer Gift Card</div>
+        <div class="form-group"><label class="form-label">Gift Card Code</label><input class="form-input" id="gc-transfer-code" placeholder="XXXXXXXX" style="letter-spacing:2px;text-transform:uppercase"></div>
+        <div class="form-group"><label class="form-label">Recipient Email</label><input class="form-input" id="gc-transfer-email" placeholder="friend@email.com"></div>
+        <button class="btn-primary" onclick="transferGiftCard()">Transfer</button>
+        <div id="gc-transfer-result" style="margin-top:12px;font-size:.875rem"></div>
+      </div>`;
+  }
+}
+
+function selectDenom(amount, el) {
+  document.querySelectorAll('.gc-denom').forEach(d=>d.classList.remove('selected'));
+  el.classList.add('selected');
+  state.gcSelectedAmount = amount;
+}
+
+async function purchaseGiftCard() {
+  if (!state.token) { navigate('login'); return; }
+  if (!state.gcSelectedAmount) { toast('Select an amount','error'); return; }
+  const r = await api('POST', '/gift-cards/purchase', {
+    amount: state.gcSelectedAmount,
+    recipient_email: document.getElementById('gc-recipient').value||null,
+    message: document.getElementById('gc-message').value||null,
+  });
+  if (!r.success) { toast(r.error||'Error','error'); return; }
+  state.gcCardId = r.data.gift_card_id;
+  state.gcPaymentId = r.data.payment_id;
+  // Confirm payment
+  const r2 = await api('POST', '/gift-cards/payment/confirm', {payment_id: state.gcPaymentId, gift_card_id: state.gcCardId});
+  const el = document.getElementById('gc-purchase-result');
+  el.innerHTML = `
+    <div class="gc-card">
+      <div class="gc-card-amount">${fmtRp(state.gcSelectedAmount)}</div>
+      <div>Gift Card</div>
+      <div class="gc-card-footer">
+        <div class="gc-card-code">${r.data.code}</div>
+        <div class="gc-card-status">${r2.success?'✓ Paid':'Pending payment'}</div>
+      </div>
+    </div>
+    <div class="alert alert-success">Gift card purchased! Code: <strong>${r.data.code}</strong></div>`;
+  toast('Gift card purchased!','success');
+}
+
+async function loadMyGiftCards(c) {
+  if (!state.token) { c.innerHTML='<div class="alert alert-info">Sign in to view your gift cards.</div>'; return; }
+  const r = await api('GET', '/gift-cards');
+  const cards = r.data?.gift_cards||[];
+  c.innerHTML = cards.length ? cards.map(gc=>`
+    <div class="gc-card" style="max-width:320px;margin-bottom:12px">
+      <div class="gc-card-amount">${fmtRp(gc.amount)}</div>
+      <div style="font-size:.8rem;opacity:.8">Gift Card</div>
+      <div class="gc-card-footer">
+        <div class="gc-card-code">${gc.code}</div>
+        <div class="gc-card-status">${gc.status}</div>
+      </div>
+    </div>`).join('') : '<div class="empty-state"><div class="empty-icon">🎁</div><div class="empty-title">No gift cards yet</div></div>';
+}
+
+async function redeemGiftCard() {
+  const code = document.getElementById('gc-redeem-code').value.trim().toUpperCase();
+  const r = await api('POST', '/gift-cards/redeem', {code});
+  const el = document.getElementById('gc-redeem-result');
+  if (r.success) { el.style.color='#16a34a'; el.textContent='✓ Redeemed! Balance added to your account.'; toast('Gift card redeemed!','success'); }
+  else { el.style.color='#ef4444'; el.textContent=r.error||'Invalid code'; }
+}
+
+async function transferGiftCard() {
+  const r = await api('POST', '/gift-cards/transfer', {
+    code: document.getElementById('gc-transfer-code').value.trim().toUpperCase(),
+    recipient_email: document.getElementById('gc-transfer-email').value,
+  });
+  const el = document.getElementById('gc-transfer-result');
+  if (r.success) { el.style.color='#16a34a'; el.textContent='✓ Gift card transferred!'; toast('Transferred!','success'); }
+  else { el.style.color='#ef4444'; el.textContent=r.error||'Transfer failed'; }
+}
+
+// ── Cancel Order ──────────────────────────────────────────────────────────
+async function cancelOrder(orderId) {
+  if (!confirm('Cancel this order? The amount will be refunded to your balance.')) return;
+  const r = await api('PUT', '/orders/'+orderId+'/status', {status:'cancelled'});
+  if (!r.success) { toast(r.error||'Error','error'); return; }
+  toast('Order cancelled. Balance refunded.','success');
+  showAccountTab('orders');
+}
+
+// ── Edit Profile ──────────────────────────────────────────────────────────
+async function doEditProfile() {
+  const body = {};
+  const name = document.getElementById('ep-name')?.value.trim();
+  const phone = document.getElementById('ep-phone')?.value.trim();
+  const city = document.getElementById('ep-city')?.value.trim();
+  const postal = document.getElementById('ep-postal')?.value.trim();
+  const dob = document.getElementById('ep-dob')?.value;
+  if (name) body.name = name;
+  if (phone) body.phone = phone;
+  if (city) body.city = city;
+  if (postal) body.postal_code = postal;
+  if (dob) body.date_of_birth = dob;
+  const r = await api('PUT', '/auth/profile', body);
+  if (!r.success) { toast(r.error||'Error','error'); return; }
+  if (r.data?.name) state.user.name = r.data.name;
+  toast('Profile updated successfully','success');
+  updateNav();
+}
+
+// ── UTILS ─────────────────────────────────────────────────────────────────
+function fmtRp(n) {
+  return 'Rp ' + Number(n||0).toLocaleString('id-ID');
+}
+
+function fmtDate(s) {
+  if (!s) return '—';
+  return new Date(s).toLocaleDateString('en-GB', {day:'numeric',month:'short',year:'numeric'});
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────
+(async function init() {
+  if (state.token) await loadMe();
+  updateNav();
+  if (state.user && !state.user.email_verified) {
+    navigate('verify-email');
+  } else {
+    await loadHome();
+  }
+})();
+</script>
+</body>
+</html>

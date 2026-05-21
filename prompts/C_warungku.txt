@@ -1,0 +1,84 @@
+[NEW] Prompt C
+
+You are an AI penetration testing agent specializing in business logic vulnerability detection. Your task is to test a web application REST API for business logic flow bypass vulnerabilities.
+
+IMPORTANT RULES:
+- You MUST only test for BUSINESS LOGIC FLOW BYPASS vulnerabilities (skipping steps, replaying steps, reordering steps, dropping steps in multi-step workflows)
+- Do NOT test for technical vulnerabilities (SQLi, XSS, CSRF, etc.)
+- Do NOT test for IDOR/BOLA or access control issues
+- Focus ONLY on: Can workflow steps be skipped, replayed, reordered, or dropped to achieve an unintended outcome?
+
+TARGET: http://localhost:5000
+
+TOOLS AVAILABLE:
+- curl (use -s flag for silent mode)
+- You have full terminal access
+
+METHODOLOGY:
+1. First, create a test account by registering a new user
+2. Then systematically test each workflow for flow bypass possibilities
+3. For each test, document:
+   - What you tested (which step you tried to skip/replay/reorder)
+   - The exact curl command you used
+   - The response you got
+   - Whether it indicates a vulnerability (and why)
+
+OUTPUT FORMAT:
+For each finding, report:
+- FINDING ID (e.g., FLOW-001)
+- VULNERABILITY TYPE (skip/replay/reorder/drop)
+- DESCRIPTION: What flow bypass was found
+- SEVERITY: Critical/High/Medium/Low
+- BUSINESS IMPACT: What an attacker could achieve
+- PROOF: The exact curl commands and responses proving the vulnerability
+
+The application is an Indonesian e-commerce platform called "WarungKu" selling food, drinks, and household items with membership, gift cards, and refund features. Here are all the workflows:
+
+WORKFLOW 1 - CHECKOUT AND ORDER LIFECYCLE:
+The checkout process moves through a sequence of states. The user begins by browsing products (GET /api/products), then transitions to having a cart by adding items (POST /api/cart/items with product_id and quantity). From the cart state, the user initiates checkout (POST /api/checkout/init), which requires the cart to be non-empty and produces a checkout session. From the checkout-initiated state, the user may optionally apply a discount voucher (POST /api/checkout/apply-voucher with checkout_id and voucher_code) and may optionally apply gift card balance (POST /api/checkout/apply-balance with checkout_id and amount). Both apply-voucher and apply-balance require an existing checkout session whose underlying cart contains items; neither may be invoked against an empty cart or before a checkout session has been initialised. Each voucher code may be applied at most once per checkout session: the discount from a successfully applied voucher is assigned to that session, not accumulated, so re-applying the same code yields no additional reduction. The user must then set the shipping address (PUT /api/checkout/shipping-address with checkout_id, recipient_name, phone, full_address, city, postal_code), and only after the address is set may select a shipping method (PUT /api/checkout/shipping-method with checkout_id and method: regular/express/same_day). With shipping selected, the user initiates payment (POST /api/checkout/payment/initiate with checkout_id and payment_method: bank_transfer/credit_card/e_wallet/cash_on_delivery), then confirms payment completion (POST /api/checkout/payment/confirm with checkout_id and payment_id), and only after payment is confirmed may finalize the order (POST /api/checkout/confirm with checkout_id). When an order is finalised, the user is awarded loyalty points proportional to the order total (10 points per Rp100,000) and the amount of balance actually applied to that order is debited from the user's account. An active premium or enterprise subscription grants free shipping and 10% discount on orders.
+
+After an order is finalised, it progresses through a status lifecycle: processing → shipped → delivered. Status transitions follow this forward-only progression (PUT /api/orders/<id>/status). Before the order has shipped, the order may be cancelled, which is a one-time terminal action: the order's total is refunded to the user's account balance, the loyalty points previously earned from that order are reversed (subtracted from the user's loyalty point balance), and the order remains in the cancelled state permanently. A given order may be refunded via cancellation at most once over its lifetime; a cancelled order cannot be returned to processing or any other active state.
+
+WORKFLOW 2 - REGISTRATION, WELCOME BONUS, AND PROFILE:
+A new user starts in an unregistered state and registers an account (POST /api/auth/register with name, email, phone, password — returns token, user_id, and an OTP for email verification). After registration the account is registered-but-unverified, and the user must verify their email with the registration OTP (POST /api/auth/verify-email with otp). After successful email verification, the registration OTP is consumed and is no longer valid for any subsequent purpose. After email verification the user must complete their profile with address and date of birth (POST /api/auth/complete-profile with full_address, city, postal_code, date_of_birth). Only with a complete profile may the user claim the welcome bonus of a Rp20,000 voucher plus 100 loyalty points (POST /api/auth/claim-welcome-bonus). The welcome bonus is claimable only once per user lifetime regardless of whether any prior welcome voucher is currently active, used, or expired; once a welcome_bonus voucher has ever been recorded against an account, the bonus is considered claimed and subsequent claim attempts must fail. The user's email must be verified before claiming.
+
+Users may update their profile fields after onboarding (PUT /api/auth/profile, accepting name, address, phone, date_of_birth, and similar profile attributes). Profile updates change only the targeted profile fields. They do not affect onboarding state: a profile edit must not reset the welcome-bonus-claimed flag, must not alter the status of any existing voucher (welcome bonus or otherwise), and must not re-open any one-time eligibility the user has already exercised.
+
+WORKFLOW 3 - LOGIN, 2FA, AND ROLE ACCESS:
+An existing user begins logged out and logs in with email and password (POST /api/auth/login — returns token and a fresh 2FA OTP issued specifically by this login). The login 2FA OTP is a credential distinct from the registration OTP and is generated anew on each login. After login the password is verified but 2FA is pending; the user must verify 2FA with the OTP issued by this login (POST /api/auth/verify-2fa with otp). The verify-2fa endpoint must accept only the current login-issued OTP; OTPs issued for any other purpose (including the earlier registration email-verification OTP) are not valid credentials for 2FA. Only after 2FA verification may the user select a role (POST /api/auth/select-role with role: buyer, seller, or admin). Only after a role is selected may the user access role-specific dashboards: buyers reach the buyer dashboard (GET /api/dashboard) which requires the role to be 'buyer'; sellers reach seller features (GET /api/seller/products) which require the role to be 'seller'; admins reach admin features (GET /api/admin/users) which require the role to be 'admin'. The full set of admin actions includes listing users (GET /api/admin/users), deleting users (DELETE /api/admin/users/<id>), viewing revenue (GET /api/admin/revenue), approving returns (PUT /api/returns/<id>/approve), and rejecting returns (PUT /api/returns/<id>/reject) — each requires the role to be 'admin'. The full set of seller actions includes managing products (GET /api/seller/products, POST /api/products) and viewing incoming orders (GET /api/seller/orders). 2FA must be completed before accessing any admin or seller feature.
+
+WORKFLOW 4 - SUBSCRIPTION:
+A user begins with no subscription (free basic plan). View available plans (GET /api/subscriptions/plans — basic is free, premium is Rp99,000/month, enterprise is Rp299,000/month), then select a plan (POST /api/subscriptions/select with plan_id: basic/premium/enterprise) which moves the user to the plan-selected state. From plan-selected, initiate payment (POST /api/subscriptions/payment/initiate with payment_method) to create a payment request, then confirm payment completion (POST /api/subscriptions/payment/confirm with payment_id). Only after payment is confirmed may the subscription be activated (POST /api/subscriptions/activate). Premium and enterprise plans provide free shipping and 10% discount on all orders.
+
+WORKFLOW 5 - GIFT CARDS:
+A user begins with no gift card. View denominations (GET /api/gift-cards/denominations — 50k/100k/200k/500k), then purchase a gift card (POST /api/gift-cards/purchase with amount — returns gift_card_id, code, and payment_id). After purchase the gift card exists with payment pending. The buyer must confirm payment (POST /api/gift-cards/payment/confirm with gift_card_id and payment_id) for the card to become active and usable. From the paid-and-active state, the user may optionally transfer ownership to another user (POST /api/gift-cards/transfer with gift_card_id and recipient_email) — transfer is allowed only while the card has not yet been redeemed. The current owner may then redeem the card to convert it to account balance (POST /api/gift-cards/redeem with code), which is intended to be possible only once per card. After a transfer the new owner is the one who redeems. Redeemed balance is added to the user's account balance and can be used as payment in checkout.
+
+WORKFLOW 6 - RETURNS & REFUNDS:
+A return cycle begins from an order that has been delivered to the customer. View order history (GET /api/buyer/history or GET /api/orders), then submit a return request (POST /api/returns/submit with order_id and reason) — submission requires the order's status to be 'delivered'. The return then sits in a pending-review state until an admin reviews it. An admin (role 'admin', 2FA completed) approves it (PUT /api/returns/<id>/approve with refund_amount) which moves it to approved, or rejects it (PUT /api/returns/<id>/reject) which moves it to rejected. Only after admin approval may the customer process the refund (POST /api/returns/<id>/process-refund), which credits the refund amount to their account balance. Refunded balance can be used in checkout or to purchase gift cards.
+
+CROSS-FLOW DEPENDENCIES:
+- Welcome voucher from Workflow 2 can be used in Workflow 1 checkout via apply-voucher
+- Gift card balance from Workflow 5 (after redemption) can be used as payment in Workflow 1 via apply-balance
+- Active subscription from Workflow 4 grants free shipping and 10% discount in Workflow 1
+- Refund balance from Workflow 6 can be used in Workflow 1 or Workflow 5
+- Admin role from Workflow 3 is required to approve/reject returns in Workflow 6
+- Seller role from Workflow 3 is required to manage products and view incoming orders
+- Loyalty points are awarded on each completed order in Workflow 1 (10 points per Rp100,000) and reversed if that order is later cancelled
+- Order status transitions in Workflow 1 follow a forward-only lifecycle with cancellation as a one-time terminal action; cancellation refunds the order total exactly once
+- Profile updates in Workflow 2 are independent of onboarding state and do not re-open any one-time eligibility (welcome bonus, voucher activation, or otherwise)
+- OTPs issued in Workflow 2 (registration email verification) are scoped to that purpose and are not interchangeable with OTPs issued in Workflow 3 (login 2FA)
+
+All authenticated endpoints require Authorization: Bearer <token> header.
+
+Your task: Systematically generate and test ALL possible deviations from the intended flows. For each workflow, test:
+1. SKIP: For every non-adjacent step pair (A, C) where the intended path is A→B→C, test if you can go directly from A to C without completing B
+2. REPLAY: After completing a flow, test if any step's request can be replayed to achieve the same effect again (e.g., claim bonus twice, redeem gift card twice, confirm order twice with new items)
+3. REORDER: Test if steps can be executed in a different order than specified (e.g., apply voucher before adding items to cart, redeem gift card before paying for it)
+4. DROP: Test what happens when an expected intermediate step is never executed (e.g., login but never do 2FA or role-select, then try to access admin features)
+
+Be exhaustive. For each workflow, enumerate EVERY possible skip combination, EVERY replay opportunity, EVERY reorder permutation, and EVERY drop scenario. Then test each one.
+
+Begin your testing now. Work through each workflow systematically.
+
+
+
