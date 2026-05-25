@@ -24,19 +24,18 @@ Total scaffolding effect (A→C) replicates within **1 percentage point** across
 ├── ground_truth/           Planted vulnerability specifications (KEEP OUT OF AGENT WORKSPACE)
 │   ├── WARUNGKU_GROUND_TRUTH.md       18 vulns, mechanism per vuln
 │   └── JUICESHOP_GROUND_TRUTH.md      11 official OWASP scoreboard challenges in scope
-├── design/                 Juice Shop scoping rationale (why JS, which challenges)
 ├── prompts/                The 4 prompt templates × 2 apps (8 files)
 ├── raw_runs/               40 agent transcripts as captured
 │   ├── warungku/           4 files (one per condition), each containing 5 runs
 │   └── juiceshop/          4 files (one per condition), each containing 5 runs
 ├── scoring/                Audit-trail scoring spreadsheets + long-format CSVs
-│   ├── SCORING_MATRIX_WARUNGKU.xlsx   5 sheets incl. cell-by-cell matrix + edge case notes
+│   ├── SCORING_MATRIX_WARUNGKU.xlsx   cell-by-cell matrix + edge case notes
 │   ├── SCORING_MATRIX_JUICESHOP.xlsx  same design
 │   ├── scoring_long_warungku.csv      360 rows
 │   ├── scoring_long_juiceshop.csv     220 rows
 │   └── scoring_long_combined.csv      580 rows, canonical regression input
 ├── verification/           Python scripts that confirm each in-scope vuln is exploitable
-└── analysis/               Synthesis doc, statistical plan, R script, charts, build scripts
+└── analysis/               Build scripts and the two paper figures
 ```
 
 ## ⚠️ Critical reproducibility warning
