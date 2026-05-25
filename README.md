@@ -1,4 +1,4 @@
-# BLV Prompt Scaffolding — Replication Package
+# BLV Prompt Scaffolding: Replication Package
 
 Companion repository for the paper *"Decomposing Prompt Scaffolding for LLM Agent Detection of Business Logic Vulnerabilities: A Cross-Application Empirical Study."*
 
@@ -34,14 +34,14 @@ Total scaffolding effect (A→C) replicates within **1 percentage point** across
 │   ├── SCORING_MATRIX_JUICESHOP.xlsx  same design
 │   ├── scoring_long_warungku.csv      360 rows
 │   ├── scoring_long_juiceshop.csv     220 rows
-│   └── scoring_long_combined.csv      580 rows — canonical regression input
+│   └── scoring_long_combined.csv      580 rows, canonical regression input
 ├── verification/           Python scripts that confirm each in-scope vuln is exploitable
 └── analysis/               Synthesis doc, statistical plan, R script, charts, build scripts
 ```
 
 ## ⚠️ Critical reproducibility warning
 
-`ground_truth/` files **must not** be placed inside the directory the LLM agent has read access to. The agent will read the ground truth verbatim and reproduce its content as "findings," inflating detection rate to near-100%. This is not hypothetical — the original WarungKu A4 rollout was contaminated this way (found 18/18) and was excluded from analysis; a clean re-run found 1/18, consistent with other A-condition runs.
+`ground_truth/` files **must not** be placed inside the directory the LLM agent has read access to. The agent will read the ground truth verbatim and reproduce its content as "findings," inflating detection rate to near-100%. This is not hypothetical. The original WarungKu A4 rollout was contaminated this way and found 18/18 vulnerabilities, and was excluded from analysis. A clean re-run found 1/18, consistent with the other A-condition runs.
 
 When reproducing this study, run the agent with its workspace pointing to `warungku/` (which contains app.py, static/, templates/, README.md) only. Keep `ground_truth/` elsewhere on disk and consult it only for post-hoc scoring.
 
@@ -74,7 +74,7 @@ cd verification/
 python3 verify_all.py
 ```
 
-Expected output: `29/29 PASS`. Uses Python stdlib only.
+Expected output: `29/29 PASS`. The script uses Python stdlib only.
 
 ### 4. Reproduce the agent experiment
 
@@ -101,12 +101,12 @@ Scripts use `pathlib`, are location-independent, and rely on Python stdlib + `ma
 If you use this dataset, code, or methodology, please cite:
 
 ```
-[BibTeX entry — to be filled in after publication]
+[BibTeX entry to be filled in after publication]
 ```
 
 ## License
 
-MIT — see `LICENSE`.
+MIT. See `LICENSE` for details.
 
 ## Caveat on dataset utility over time
 
