@@ -10,6 +10,9 @@ venv/
 .DS_Store
 Thumbs.db
 
+# Office lockfiles
+~$*
+
 # Editor
 .vscode/
 .idea/
