@@ -153,7 +153,8 @@ To illustrate rubric application, consider one C-condition rollout against Warun
 \begin{quote}\small\itshape
 ``A checkout session can be confirmed after \texttt{payment/initiate} without calling \texttt{payment/confirm}. The resulting order is finalised with \texttt{payment\_id} present but the payment never confirmed. \texttt{POST /api/checkout/confirm} accepts the session and produces an order.
 
-\texttt{curl -s -X POST http://localhost:5000/api/checkout/confirm \textbackslash}
+\texttt{curl -s -X POST \textbackslash}
+\\\texttt{\phantom{xx}http://localhost:5000/api/checkout/confirm \textbackslash}
 \\\texttt{\phantom{xx}-H "Authorization: Bearer <token>" \textbackslash}
 \\\texttt{\phantom{xx}-d '\{"checkout\_id":"CHK-8C858D58ED"\}'}
 
