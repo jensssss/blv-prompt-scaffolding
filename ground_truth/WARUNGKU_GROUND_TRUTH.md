@@ -18,17 +18,17 @@ Each entry includes: category, affected flow, endpoint(s), root cause, exploit p
 | 5 | Replay Welcome Bonus Claim | Replay | Flow 2 | `POST /api/auth/claim-welcome-bonus` |
 | 6 | Replay Gift Card Redemption | Replay | Flow 5 | `POST /api/gift-cards/redeem` |
 | 7 | Replay Order Confirmation | Replay | Flow 1 | `POST /api/checkout/confirm` |
-| 8 | Drop Role Selection → Default Admin | Drop | Flow 3 | `GET /api/dashboard`, admin endpoints |
-| 9 | Drop Subscription Payment → Activate | Drop | Flow 4 | `POST /api/subscriptions/activate` |
-| 10 | Reorder: Apply Voucher Before Cart | Reorder | Flow 1+2 | `POST /api/checkout/apply-voucher` |
-| 11 | Reorder: Redeem Gift Card Before Purchase Payment | Reorder | Flow 5 | `POST /api/gift-cards/redeem` |
+| 8 | Skip Role Selection → Default Admin | Skip | Flow 3 | `GET /api/dashboard`, admin endpoints |
+| 9 | Skip Subscription Payment → Activate | Skip | Flow 4 | `POST /api/subscriptions/activate` |
+| 10 | Drop checkout_id → Apply Voucher Auto-creates Session | Drop | Flow 1+2 | `POST /api/checkout/apply-voucher` |
+| 11 | Skip Payment Confirmation Before Gift Card Redeem | Skip | Flow 5 | `POST /api/gift-cards/redeem` |
 | 12 | Reorder: Submit Return Before Order Delivered | Reorder | Flow 6 | `POST /api/returns/submit` |
-| 13 | Loyalty Point Retention on Order Cancellation | Replay | Flow 1+3 | `PUT /api/orders/:id/status` |
-| 14 | Profile Edit Resets Welcome Voucher Pool | Replay | Flow 2 | `PUT /api/auth/profile` + `POST /api/auth/claim-welcome-bonus` |
-| 15 | Apply Balance to Empty Cart Creates Phantom Discount | Reorder | Flow 1 | `POST /api/checkout/apply-balance` + `POST /api/checkout/confirm` |
-| 16 | Status Transition Cycle Refund Loop | Replay | Flow 1 | `PUT /api/orders/:id/status` |
-| 17 | Verify-2FA Accepts Stale Registration OTP | Skip | Flow 2+3 | `POST /api/auth/verify-2fa` |
-| 18 | Voucher Discount Stacking via Session Re-application | Drop | Flow 1+2 | `POST /api/checkout/apply-voucher` |
+| 13 | Replay Cancel Refund Cycle Without Decrementing Loyalty Points | Replay | Flow 1+3 | `PUT /api/orders/:id/status` |
+| 14 | Replay Welcome Bonus Claim via Profile Edit | Replay | Flow 2 | `PUT /api/auth/profile` + `POST /api/auth/claim-welcome-bonus` |
+| 15 | Reorder: Apply Balance to Empty Cart | Reorder | Flow 1 | `POST /api/checkout/apply-balance` + `POST /api/checkout/confirm` |
+| 16 | Replay Status Transition Cycle Refund Loop | Replay | Flow 1 | `PUT /api/orders/:id/status` |
+| 17 | Replay Registration OTP at Verify-2FA | Replay | Flow 2+3 | `POST /api/auth/verify-2fa` |
+| 18 | Replay Voucher Code via Session Re-application | Replay | Flow 1+2 | `POST /api/checkout/apply-voucher` |
 
 ---
 
@@ -243,9 +243,9 @@ orders[order_id] = new_order  # order is recorded
 
 ---
 
-### Vulnerability 8 — Drop Role Selection → Default Admin
+### Vulnerability 8 — Skip Role Selection → Default Admin
 
-**Category:** Drop
+**Category:** Skip
 **Flow:** Flow 3 (Authentication)
 **Endpoints:** `GET /api/dashboard`, `GET /api/admin/users`, `DELETE /api/admin/users/:id`, `GET /api/admin/revenue`
 
@@ -280,9 +280,9 @@ if user_role != 'admin':
 
 ---
 
-### Vulnerability 9 — Drop Subscription Payment → Activate
+### Vulnerability 9 — Skip Subscription Payment → Activate
 
-**Category:** Drop
+**Category:** Skip
 **Flow:** Flow 4 (Subscriptions)
 **Endpoint:** `POST /api/subscriptions/activate`
 
@@ -311,9 +311,9 @@ subscriptions[user_id]['active'] = True
 
 ---
 
-### Vulnerability 10 — Reorder: Apply Voucher Before Cart
+### Vulnerability 10 — Drop checkout_id → Apply Voucher Auto-creates Session
 
-**Category:** Reorder
+**Category:** Drop
 **Flow:** Flow 1 + Flow 2
 **Endpoint:** `POST /api/checkout/apply-voucher`
 
@@ -346,9 +346,9 @@ cs['discount_amount'] = voucher['discount_amount']
 
 ---
 
-### Vulnerability 11 — Reorder: Redeem Gift Card Before Purchase Payment
+### Vulnerability 11 — Skip Payment Confirmation Before Gift Card Redeem
 
-**Category:** Reorder
+**Category:** Skip
 **Flow:** Flow 5 (Gift Cards)
 **Endpoint:** `POST /api/gift-cards/redeem`
 
@@ -411,7 +411,7 @@ if order['status'] == 'cancelled':
 
 ---
 
-### Vulnerability 13 — Loyalty Point Retention on Order Cancellation
+### Vulnerability 13 — Replay Cancel Refund Cycle Without Decrementing Loyalty Points
 
 **Category:** Replay
 **Flow:** Flow 1 (Checkout) + Flow 3 (Dashboard)
@@ -442,7 +442,7 @@ When an order is cancelled, `loyalty_points_earned` (stored on the order) should
 
 ---
 
-### Vulnerability 14 — Profile Edit Resets Welcome Voucher Pool
+### Vulnerability 14 — Replay Welcome Bonus Claim via Profile Edit
 
 **Category:** Replay
 **Flow:** Flow 2 (Registration)
@@ -478,7 +478,7 @@ if existing_welcome:
 
 ---
 
-### Vulnerability 15 — Apply Balance to Empty Cart Creates Phantom Discount
+### Vulnerability 15 — Reorder: Apply Balance to Empty Cart
 
 **Category:** Reorder
 **Flow:** Flow 1 (Checkout)
@@ -512,7 +512,7 @@ if balance_applied > 0:
 
 ---
 
-### Vulnerability 16 — Status Transition Cycle Refund Loop
+### Vulnerability 16 — Replay Status Transition Cycle Refund Loop
 
 **Category:** Replay
 **Flow:** Flow 1 (Checkout)
@@ -545,9 +545,9 @@ A per-order idempotency guard should prevent more than one refund per order (e.g
 
 ---
 
-### Vulnerability 17 — Verify-2FA Accepts Stale Registration OTP
+### Vulnerability 17 — Replay Registration OTP at Verify-2FA
 
-**Category:** Skip
+**Category:** Replay
 **Flow:** Flow 2 (Registration) + Flow 3 (Authentication)
 **Endpoint:** `POST /api/auth/verify-2fa`
 
@@ -579,9 +579,9 @@ if otp != user.get('otp_2fa') and otp != user.get('otp'):
 
 ---
 
-### Vulnerability 18 — Voucher Discount Stacking via Session Re-application
+### Vulnerability 18 — Replay Voucher Code via Session Re-application
 
-**Category:** Drop
+**Category:** Replay
 **Flow:** Flow 1 (Checkout) + Flow 2 (Registration)
 **Endpoint:** `POST /api/checkout/apply-voucher`
 
