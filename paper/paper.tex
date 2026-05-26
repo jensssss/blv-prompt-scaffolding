@@ -246,7 +246,7 @@ Three observations:
 
 \subsection{Per-Vulnerability Stratification}
 
-Figure~\ref{fig:heatmap} visualizes detection probability for each (vulnerability, condition) cell. We classify the 29 vulnerabilities into three tiers based on detection rate at the strongest condition ($C$):
+Figure~\ref{fig:heatmap} visualizes detection probability for each (vulnerability, condition) cell. We classify the 29 vulnerabilities into three tiers based on detection rate at the strongest condition ($C$), summarized in Table~\ref{tab:tiers}.
 
 \begin{table}[t]
 \centering
@@ -449,9 +449,6 @@ J.~Wei, X.~Wang, D.~Schuurmans, M.~Bosma, B.~Ichter, F.~Xia, E.~Chi, Q.~V. Le, a
 \bibitem{kojima2022zeroshot}
 T.~Kojima, S.~S. Gu, M.~Reid, Y.~Matsuo, and Y.~Iwasawa, ``Large language models are zero-shot reasoners,'' in \emph{Proc. NeurIPS}, 2022.
 
-\bibitem{wang2023selfconsistency}
-X.~Wang, J.~Wei, D.~Schuurmans, Q.~Le, E.~Chi, S.~Narang, A.~Chowdhery, and D.~Zhou, ``Self-consistency improves chain of thought reasoning in language models,'' in \emph{Proc. International Conference on Learning Representations (ICLR)}, 2023.
-
 \bibitem{brown2020gpt3}
 T.~B. Brown, B.~Mann, N.~Ryder, M.~Subbiah, J.~Kaplan, P.~Dhariwal \emph{et~al.}, ``Language models are few-shot learners,'' in \emph{Proc. NeurIPS}, 2020.
 
@@ -485,9 +482,6 @@ P.~Liang \emph{et~al.}, ``Holistic evaluation of language models,'' \emph{Transa
 \bibitem{bowman2022underclaiming}
 S.~R. Bowman, ``The dangers of underclaiming: Reasons for caution when reporting how NLP systems fail,'' in \emph{Proc. ACL}, 2022.
 
-\bibitem{hupkes2023taxonomy}
-D.~Hupkes \emph{et~al.}, ``A taxonomy and review of generalization research in NLP,'' \emph{Nature Machine Intelligence}, 2023.
-
 \bibitem{lakens2013effect}
 D.~Lakens, ``Calculating and reporting effect sizes to facilitate cumulative science: A practical primer for t-tests and ANOVAs,'' \emph{Frontiers in Psychology}, vol. 4, p. 863, 2013.
 
@@ -508,11 +502,11 @@ Anthropic, ``Claude Sonnet 4.5 system card,'' 2025. [Online]. Available: \url{ht
 \appendix
 \section*{Appendix A: Planted Vulnerability Summary}
 
-For space, the full per-vulnerability descriptions and exploit signatures are reported in supplementary material. Table~\ref{tab:wk-vulns} summarizes the WarungKu planted set; the $11$ Juice Shop in-scope challenges are: id $30$ (DELETE feedback admin-only), id $31$ (forged coupon), id $32$ (forged feedback POST), id $33$ (forged review update), id $52$ (basket manipulation), id $54$ (multiple likes race condition), id $61$ (negative-quantity order), id $19$ (confidential document), id $25$ (password type mismatch), id $67$ (password validation bypass), id $4$ (admin registration via mass assignment).
+For space, the full per-vulnerability descriptions and exploit signatures are reported in supplementary material. Table~\ref{tab:wk-vulns} summarizes the WarungKu planted set and Table~\ref{tab:js-vulns} summarizes the in-scope Juice Shop challenges.
 
 \begin{table}[h]
 \centering
-\caption{WarungKu planted vulnerabilities ($n=18$). Primitive: skip (Sk), replay (Rp), reorder (Ro), drop (Dr), accounting (Ac).}
+\caption{WarungKu planted vulnerabilities ($n=18$). Primitive: skip (Sk), replay (Rp), reorder (Ro), drop (Dr).}
 \label{tab:wk-vulns}
 \footnotesize
 \begin{tabular}{clp{4.2cm}}
@@ -530,13 +524,37 @@ V8  & Sk & default admin role from skipped select-role \\
 V9  & Sk & subscriptions/activate without payment\_status \\
 V10 & Dr & apply-voucher with fake/missing checkout\_id \\
 V11 & Sk & gift-cards/redeem without payment\_status \\
-V12 & Sk & returns/submit without order.status==delivered \\
-V13 & Ac & cancel refund credits balance but does not decrement points \\
-V14 & Ro & PUT /auth/profile resets welcome\_bonus\_claimed \\
-V15 & Ac & apply-balance never debits user balance \\
+V12 & Ro & returns/submit before order.status==delivered \\
+V13 & Rp & cancel refund credits balance but does not decrement points \\
+V14 & Rp & PUT /auth/profile resets welcome\_bonus\_claimed \\
+V15 & Ro & apply-balance to empty cart before items added \\
 V16 & Rp & cancelled order re-cancelled or cycled re-fires refund \\
 V17 & Rp & verify-2fa accepts registration OTP (cross-flow) \\
 V18 & Rp & apply-voucher uses += and accepts same code \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[h]
+\centering
+\caption{Juice Shop in-scope challenges ($n=11$, official scoreboard). Primitive abbreviations match Table~\ref{tab:wk-vulns}.}
+\label{tab:js-vulns}
+\footnotesize
+\begin{tabular}{cllp{2.6cm}}
+\toprule
+\textbf{ID} & \textbf{JS \#} & \textbf{Prim.} & \textbf{Mechanism} \\
+\midrule
+JS-01 & 30 & Sk & DELETE feedback without admin check \\
+JS-02 & 31 & Ro & forged coupon via z85 reverse-engineering \\
+JS-03 & 32 & Sk & POST feedback with arbitrary UserId \\
+JS-04 & 33 & Sk & PUT review with arbitrary author \\
+JS-05 & 52 & Ro & basket manipulation via other-user ID \\
+JS-06 & 54 & Rp & multiple likes via concurrent POSTs \\
+JS-07 & 61 & Ro & negative-quantity basket item \\
+JS-08 & 19 & Dr & confidential document at /ftp \\
+JS-09 & 25 & Dr & empty user registration accepted \\
+JS-10 & 67 & Rp & repetitive registration accepted \\
+JS-11 & 4  & Dr & admin registration via role injection \\
 \bottomrule
 \end{tabular}
 \end{table}
