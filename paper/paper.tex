@@ -1,4 +1,4 @@
-%% paper.tex — IEEE conference template
+%% paper.tex - IEEE conference template
 %% Compile: pdflatex paper && pdflatex paper   (two passes for references)
 %% Required: IEEEtran.cls (texlive-publishers on Linux, MacTeX includes it)
 
@@ -315,13 +315,13 @@ The invariant-density hypothesis explains the magnitude difference between Warun
 
 \subsection{Tier-3 Vulnerabilities Map onto Documented LLM Limits}
 
-The $7$ Tier-3 blindspots are not random. Their failure modes cluster around four mechanisms previously documented in the LLM literature:
+The $6$ Tier-3 blindspots are not random. Their failure modes cluster around four mechanisms previously documented in the LLM literature:
 
 \textbf{Compositional setup.} V5 (welcome-bonus replay after voucher used) requires a four-step setup: claim bonus $\to$ use voucher $\to$ check eligibility flag $\to$ reclaim. JS-06 (race condition) requires concurrent request orchestration. Detection of either case requires the agent to execute and inspect intermediate state across multiple operations, which is exactly the compositionality gap documented by Dziri et al.\ \cite{dziri2023faith}.
 
 \textbf{Low-prior action.} V8 (default admin role from skipped \texttt{select-role}) requires the agent to \emph{not} call a standard endpoint. JS-01 (DELETE feedback) requires probing DELETE without admin context. The agent's prior favors high-probability actions \cite{mccoy2024embers}: calling endpoints, calling with valid privileges. Skipping a standard step or probing without expected credentials is off-distribution \cite{berglund2024reversal, wu2024reasoning}.
 
-\textbf{Off-distribution identifiers.} V10 (apply-voucher with fake \texttt{checkout\_id}) requires providing a malformed identifier, and JS-05 (basket manipulation via other users' IDs) requires probing with a cross-user identifier. The agent's prior is to use valid, own-account identifiers, so both probes are off-distribution. V10 is detected $1/5$ at $C$ and falls in Tier-3, while JS-05 is detected $2/5$ at $C$ and sits at the Tier-2/Tier-3 boundary. Both illustrate the same underlying mechanism.
+\textbf{Off-distribution probes.} V10 (apply-voucher with fake \texttt{checkout\_id}) requires providing a malformed identifier; V15 (apply-balance to an empty cart) requires invoking the operation before its standard precondition; and JS-05 (basket manipulation via other users' IDs) requires probing with a cross-user identifier. The agent's prior is to use valid identifiers and conventional flow ordering, so all three probes are off-distribution. V10 and V15 are each detected $1/5$ at $C$ and fall in Tier-3, while JS-05 is detected $2/5$ at $C$ and sits at the Tier-2/Tier-3 boundary.
 
 \textbf{Tooling-and-prompt limitation.} JS-06 (race condition) is detected $0/20$. Race-condition detection requires concurrent request orchestration; Claude Code's default loop is sequential bash. We classify this as a tooling rather than capability limit: extending the agent's tool set with a concurrent-curl primitive could plausibly close the gap. This is a future-work direction with practical implications for tool vendors.
 
